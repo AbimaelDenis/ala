@@ -6,10 +6,16 @@
 package com.mycompany.ala.gui;
 
 
+import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
 import com.mycompany.ala.services.OrderServiceService;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.File;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -23,6 +29,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     public OrderServiceListView() {
         initComponents();  
         tbOrderServices.setModel(model);
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -36,9 +43,10 @@ public class OrderServiceListView extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         tbOrderServices = new javax.swing.JTable();
+        jToolBar1 = new javax.swing.JToolBar();
         btnNew = new javax.swing.JButton();
+        btnConsult = new javax.swing.JButton();
         btnFilter = new javax.swing.JButton();
-        btnEdit = new javax.swing.JButton();
         btnImport = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -56,12 +64,24 @@ public class OrderServiceListView extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tbOrderServices);
 
+        jToolBar1.setRollover(true);
+
         btnNew.setText("Novo");
         btnNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewActionPerformed(evt);
             }
         });
+        jToolBar1.add(btnNew);
+
+        btnConsult.setText("Consultar");
+        btnConsult.setToolTipText("");
+        btnConsult.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnConsult);
 
         btnFilter.setText("Filtrar");
         btnFilter.addActionListener(new java.awt.event.ActionListener() {
@@ -69,14 +89,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
                 btnFilterActionPerformed(evt);
             }
         });
-
-        btnEdit.setText("Editar");
-        btnEdit.setToolTipText("");
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditActionPerformed(evt);
-            }
-        });
+        jToolBar1.add(btnFilter);
 
         btnImport.setText("Importar");
         btnImport.addActionListener(new java.awt.event.ActionListener() {
@@ -84,6 +97,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
                 btnImportActionPerformed(evt);
             }
         });
+        jToolBar1.add(btnImport);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -91,28 +105,15 @@ public class OrderServiceListView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnFilter)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEdit)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnNew)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnImport)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnNew)
-                    .addComponent(btnFilter)
-                    .addComponent(btnEdit)
-                    .addComponent(btnImport))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(17, 17, 17)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -128,11 +129,25 @@ public class OrderServiceListView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnFilterActionPerformed
 
-    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnEditActionPerformed
+    private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
+        //OrderServiceFormView osfv = new OrderServiceFormView(new OrderServiceListView(), true);
+        JDialog osfv = new JDialog(this, true);      
+        OrderServiceFormView view = new OrderServiceFormView();   
+        osfv.setContentPane(view.getContentPane());
+        
+        osfv.setSize(view.getSize());
+        osfv.setTitle("Ordem de Serviço");
+        osfv.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        osfv.setLocationRelativeTo(null);
+        osfv.setVisible(true);
+        
+        //exibir no centro da tela
+    }//GEN-LAST:event_btnConsultActionPerformed
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
+        importServicesFromFile();
+    }//GEN-LAST:event_btnImportActionPerformed
+    private void importServicesFromFile(){
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Aquivos de texto (.txt)", "txt");
         
         String baseDirectory = System.getProperty("user.home") + "/Desktop";
@@ -149,10 +164,13 @@ public class OrderServiceListView extends javax.swing.JFrame {
         if(result == JFileChooser.APPROVE_OPTION){
             path = fileChooser.getSelectedFile().getAbsolutePath();
             OrderServiceService.subscribeDataChangeListener(model);
-            OrderServiceService.registerOrderServices(path);
+            try{
+                JOptionPane.showMessageDialog(this, OrderServiceService.importOrderServices(path));
+            }catch(ServiceException e){
+                JOptionPane.showMessageDialog(this, e.getMessage());
+            }
         }
-    }//GEN-LAST:event_btnImportActionPerformed
-
+    }
     /**
      * @param args the command line arguments
      */
@@ -192,11 +210,12 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnConsult;
     private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnImport;
     private javax.swing.JButton btnNew;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable tbOrderServices;
     // End of variables declaration//GEN-END:variables
 }

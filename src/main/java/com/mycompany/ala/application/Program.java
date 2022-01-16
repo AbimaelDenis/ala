@@ -15,12 +15,8 @@ import com.mycompany.ala.gui.OrderServiceListView;
  */
 public class Program {
     public static void main(String[] args){
-        OrderServiceListView slv = new OrderServiceListView();
-        slv.setTitle("Ordens de Serviço");
-        slv.setVisible(true);
-        
-        String path = "F:\\example.txt";
-        
-        
+        OrderServiceListView oslv = new OrderServiceListView();
+        oslv.setTitle("Ordens de Serviço");
+        oslv.setVisible(true);  
     }
 }

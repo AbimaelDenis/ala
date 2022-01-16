@@ -18,19 +18,21 @@ public final class OrderService extends Service {
     private String lote;
     private Date createDate;
     private String description;
+    private String technicalObject;
     private String local;
     private Double unlockKm;
     private ExpenditureType expenditureType;
     private String r;
     
-    public OrderService(String id, String lote, String alim, String base, ServiceType serviceType, String local, Double unlockKm, String description, Date registerDate, String r) {
+    public OrderService(String id, String lote, String alim, String base, ServiceType serviceType, String technicalObject, String local, Double unlockKm, String description, Date registerDate) {
         super(id, registerDate, base);
         super.setAlim(alim);
         super.setServiceType(serviceType);
         this.lote = lote;
         this.description = description;
-        this.local = local;
-        this.unlockKm = unlockKm;     
+        this.technicalObject = technicalObject;
+        this.local = local;  
+        this.unlockKm = unlockKm;
     }
 
     public Date getCreateDate() {
@@ -47,6 +49,14 @@ public final class OrderService extends Service {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getTechnicalObject() {
+        return technicalObject;
+    }
+
+    public void setTechnicalObject(String technicalObject) {
+        this.technicalObject = technicalObject;
     }
 
     public String getLocal() {

@@ -19,6 +19,10 @@ public final class Reserv {
     
     private List<Service> services;
     private List<Material> materials;
+    
+     public Reserv(String id) {
+        this.id = id;
+    }
 
     public Reserv(String id, String receptor, ReservType reservType) {
         this.id = id;
@@ -57,4 +61,11 @@ public final class Reserv {
     public void addMaterial(Material material){
         materials.add(material);
     }
+
+    @Override
+    public String toString() {
+        return getId();
+    }
+    
+    
 }

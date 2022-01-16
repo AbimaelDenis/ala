@@ -114,6 +114,14 @@ public abstract class Service {
         logs.add(log);
     }
     
+    public String getReservs(){
+        String reserv = "";
+        for(Reserv r : reservs){
+            reserv += r + " ";
+        }
+        return reserv;
+    }
+    
     public void addReserv(Reserv reserv){
         reservs.add(reserv);
     }
