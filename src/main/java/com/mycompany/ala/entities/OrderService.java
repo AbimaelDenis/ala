@@ -7,14 +7,16 @@ package com.mycompany.ala.entities;
 
 import com.mycompany.ala.enums.ExpenditureType;
 import com.mycompany.ala.enums.ServiceType;
-import com.mycompany.ala.enums.StatusService;
+import java.io.Serializable;
 import java.util.Date;
+
 
 /**
  *
  * @author Abimael
  */
-public final class OrderService extends Service {
+
+public class OrderService extends Service implements Serializable{
     private String lote;
     private Date createDate;
     private String description;

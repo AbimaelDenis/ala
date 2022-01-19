@@ -19,7 +19,7 @@ import javax.swing.table.AbstractTableModel;
 public class OrderServiceTableModel extends AbstractTableModel implements DataChangeListener {
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private static List<OrderService> services = new ArrayList<>();
-    private String[] columns = {"Id", "Lote", "Alimentador", "Obj. Técnico", "Local", "Projeto", "Reservas", "Tipo", "Status", "Data de Registro"};
+    private String[] columns = {"Id", "Lote", "Alimentador", "Km", "Obj. Técnico", "Local", "Base", "Projeto", "Reservas", "Tipo", "Status", "Data de Registro"};
     
     @Override
     public int getRowCount() {
@@ -45,16 +45,20 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
         if(columnIndex == 2)
             return services.get(rowIndex).getAlim();
         if(columnIndex == 3)
-            return services.get(rowIndex).getTechnicalObject();
+            return services.get(rowIndex).getUnlockKm();
         if(columnIndex == 4)
-            return services.get(rowIndex).getLocal();
+            return services.get(rowIndex).getTechnicalObject();
         if(columnIndex == 5)
-            return services.get(rowIndex).getR();
+            return services.get(rowIndex).getLocal();
         if(columnIndex == 6)
+            return services.get(rowIndex).getBase();
+        if(columnIndex == 7)
+            return services.get(rowIndex).getR();
+        if(columnIndex == 8)
             return services.get(rowIndex).getReservs();
-        if(columnIndex == 7)
+        if(columnIndex == 9)
             return services.get(rowIndex).getServiceType();
-        if(columnIndex == 7)
+        if(columnIndex == 10)
             return services.get(rowIndex).getStatusService();
         else       
             return sdf.format(services.get(rowIndex).getRegisterDate());

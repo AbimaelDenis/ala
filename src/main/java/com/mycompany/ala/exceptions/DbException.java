@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.ala.enums;
+package com.mycompany.ala.exceptions;
 
 /**
  *
  * @author Abimael
  */
-public enum ServiceType {
-    PODA,
-    TERMOGRÁFICA,
-    ESTRUTURAL,
-    MELHORIA;
+public class DbException extends RuntimeException{
+    
+   public DbException(String msg){
+       super(msg);
+   }
 }

@@ -5,9 +5,12 @@
  */
 package com.mycompany.ala.services;
 
+import com.mycompany.ala.dao.DaoFactory;
+import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
-import com.mycompany.ala.entities.Service;
+
+
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.ServiceException;
@@ -15,14 +18,17 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+
 import java.util.List;
-import java.util.Set;
+
 import java.util.function.Predicate;
-import javax.swing.JOptionPane;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+
 
 /**
  *
@@ -31,6 +37,7 @@ import javax.swing.JOptionPane;
 public final class OrderServiceService {
     
     private static List<DataChangeListener> listeners = new ArrayList<>();
+    private static OrderServiceDao osDao = DaoFactory.createOrderServiceDao();
     
     public static String importOrderServices(String path){
         int sum = 0;
@@ -54,25 +61,25 @@ public final class OrderServiceService {
                         line = br.readLine();                       
                     }
                 }
-                try{   
-                    OrderService service = new OrderService(loadId(row[0]), row[1].trim(), row[2].trim(), 
-                                                        row[3].trim(), ServiceType.valueOf(row[4].trim()), 
-                                                        row[5], row[6], Double.parseDouble(row[7].replace(",", ".")), 
-                                                        row[9], new Date());
-                    service.setStatusService(StatusService.REGISTRADO);
-                    loadReserv(service, row[8]);       
-                    System.out.println(service); 
-                    listeners.forEach(x -> x.onDataChange(service));
-                    sum++;
-                }catch(ServiceException e){
-                    throw new ServiceException(e.getMessage() + (sum+1));
-                    //return "Id not processed in line " + (sum-1);    
+                   
+                OrderService service = new OrderService(loadId(row[0]), row[1].trim(), row[2].trim(), 
+                                                    row[3].trim(), ServiceType.valueOf(row[4].trim()), 
+                                                    row[5], row[6], Double.parseDouble(row[7].replace(",", ".")), 
+                                                    row[9], new Date());
+                service.setStatusService(StatusService.REGISTRADO);
+                loadReserv(service, row[8]);
+                if(osDao.containsOrderService(service)){
+                    throw new ServiceException("Arealdy exist! element in line: ");
                 }
+                listeners.forEach(x -> x.onDataChange(service));
+                sum++;              
             }          
         }catch(IOException e){
             System.out.print(e.getMessage());
         }catch(IllegalArgumentException e1){
             System.out.print(e1.getMessage());
+        }catch(ServiceException e){
+            throw new ServiceException(e.getMessage() + (sum+1));
         }
         return "Importado " + sum + " serviços!";
     }
@@ -95,7 +102,7 @@ public final class OrderServiceService {
             if(newId[0].trim().replace(" ", "").length() > 5 && newId[1].length() == 4){
                 prefix = newId[0].replace(" ", "").trim().substring(0, 4);
                 if(prefix.matches("[+-]?\\d*(\\.\\d+)?") || prefix.matches(".*\\d.*")) //verifica se o prex é um número ou contem algum
-                    throw new ServiceException("Error of loadId() in line: ");
+                    throw new ServiceException("Error of prefix for load Id in line: ");
                 newId[0] = newId[0].substring(5).trim();
                 Integer numberId = Integer.parseInt(newId[0]);
                 return prefix + " " +String.valueOf(numberId) + "/" + newId[1].trim();
@@ -103,7 +110,7 @@ public final class OrderServiceService {
                 return null;
             }
         }catch(NumberFormatException e){
-             throw new ServiceException("Error in load Id");
+             throw new ServiceException("Error in load Id: número de identificação contem letra(s)");
         }
     }
     

@@ -9,8 +9,7 @@ package com.mycompany.ala.gui;
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
 import com.mycompany.ala.services.OrderServiceService;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
