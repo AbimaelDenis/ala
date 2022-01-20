@@ -103,7 +103,7 @@ public final class OrderServiceService {
         try{
             if(newId[0].trim().replace(" ", "").length() > 5 && newId[1].length() == 4){
                 prefix = newId[0].replace(" ", "").trim().substring(0, 4);
-                if(prefix.matches("[+-]?\\d*(\\.\\d+)?") || prefix.matches(".*\\d.*")) //verifica se o prex é um número ou contem algum
+                if(prefix.matches("[+-]?\\d*(\\.\\d+)?") || prefix.matches(".*\\d.*")) //verifica se o prefix é um número ou contem algum
                     throw new ServiceException("Error of prefix for load Id in line: ");
                 newId[0] = newId[0].substring(5).trim();
                 Integer numberId = Integer.parseInt(newId[0]);

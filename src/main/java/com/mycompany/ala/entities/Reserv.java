@@ -8,6 +8,7 @@ package com.mycompany.ala.entities;
 import com.mycompany.ala.enums.ReservType;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -19,7 +20,7 @@ public final class Reserv {
     private Date needDate;
     private ReservType reservType;
     
-    private List<Service> services;
+    private Service service;
     private List<Material> materials;
     
      public Reserv(String id) {
@@ -64,14 +65,45 @@ public final class Reserv {
         this.reservType = reservType;
     }
     
-    public void referService(Service service){
-        services.add(service);
+    public Service getService(){
+        return service;
+    }
+    
+    public void setService(Service service){
+        this.service = service;
     }
     
     public void addMaterial(Material material){
         materials.add(material);
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Reserv other = (Reserv) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.service, other.service)) {
+            return false;
+        }
+        return true;
+    }
+    
     @Override
     public String toString() {
         return getId();

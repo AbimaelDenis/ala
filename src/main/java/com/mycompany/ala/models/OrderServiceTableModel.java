@@ -5,6 +5,7 @@
  */
 package com.mycompany.ala.models;
 
+import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.services.DataChangeListener;
 import java.text.SimpleDateFormat;
@@ -70,6 +71,11 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
             services.add((OrderService) obj);
             this.fireTableDataChanged();
         }
+    }
+    
+    public void loadServicesList(){ 
+        services = DaoFactory.createOrderServiceDao().findAllOpenServices();
+        this.fireTableDataChanged();
     }
 
     

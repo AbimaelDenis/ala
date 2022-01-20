@@ -8,11 +8,19 @@ package com.mycompany.ala.dao.impl;
 import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.db.DB;
 import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.entities.Reserv;
+import com.mycompany.ala.enums.ExpenditureType;
+import com.mycompany.ala.enums.ServiceType;
+import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -52,13 +60,13 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
     @Override
     public void insertOrderService(OrderService os) {
         PreparedStatement st = null;
-        ResultSet rs = null;
+        
         try{
             st = conn.prepareStatement("INSERT INTO orderservice (Id, Lote, Alimentador, Base, " 
                                         + "Tipo, ObjetoTecnico, Localizacao, Km, R, Reserva, Descricao, "
-                                        + "DataRegistro, Cidade, Fiscal, "
-                                        + "Situacao) "
-                                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                        + "DataRegistro, DataConclusao, DataEncerramento, Cidade, Fiscal, "
+                                        + "Situacao, TipoDespesa) "
+                                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             st.setString(1, os.getId());
             st.setString(2, os.getLote());
@@ -70,17 +78,89 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             st.setDouble(8, os.getUnlockKm());
             st.setString(9, os.getR());
             st.setString(10, os.getReservsId().trim());
-            st.setString(11, os.getDescription());           
+            st.setString(11, os.getDescription());
+            
             st.setDate(12, new java.sql.Date(os.getRegisterDate().getTime()));
-            st.setString(13, os.getCity());
-            st.setString(14, os.getFiscal());
-            st.setString(15, os.getStatusService().toString());
+            if(os.getConclusionDate() != null) st.setDate(13, new java.sql.Date(os.getConclusionDate().getTime()));
+            else st.setDate(13, null);
+            if(os.getCloseDate() != null) st.setDate(14, new java.sql.Date(os.getCloseDate().getTime()));
+            else st.setDate(14, null);
+            
+            st.setString(15, os.getCity());
+            st.setString(16, os.getFiscal());
+            st.setString(17, os.getStatusService().toString());
+            
+            if(os.getExpenditureType() != null) st.setString(18, os.getExpenditureType().toString());
+            else st.setDate(18, null);
 
             int rowsAffected = st.executeUpdate();
         }catch(SQLException e){
             throw new DbException("Error in insertOrderService(): " + e.getMessage());          
+        }finally{
+            DB.closeStatement(st);
         }
         
+    }
+
+    @Override
+    public List<OrderService> findAllOpenServices() {
+        List<OrderService> services = new ArrayList<>();
+        Statement st = null;
+        ResultSet rs = null;
+        try{
+            st = conn.createStatement();
+            
+            rs = st.executeQuery("SELECT*FROM orderservice WHERE Situacao != 'ENCERRADO'");
+            
+            while(rs.next()){
+                services.add(instantiateOrderService(rs));
+            }   
+            return services;      
+        }catch(SQLException e){
+            throw new DbException("Error in findAllOpenServices(): " + e.getMessage());
+        }finally{
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+    }
+
+    private OrderService instantiateOrderService(ResultSet rs) throws SQLException {
+                String id = rs.getString("Id");
+                String lote = rs.getString("Lote");
+                String alim = rs.getString("Alimentador");
+                String base = rs.getString("Base");
+                String serviceType = rs.getString("Tipo");
+                String objTec = rs.getString("ObjetoTecnico");
+                String local = rs.getString("Localizacao");
+                Double unlockKm = rs.getDouble("Km");
+                String R = rs.getString("R");
+                String[] reservs = rs.getString("Reserva").split(" ");
+                String decript = rs.getString("Descricao");
+                Date registerDate = rs.getDate("DataRegistro");
+                Date conclusionDate = rs.getDate("DataConclusao");
+                Date closeDate = rs.getDate("DataEncerramento");
+                String city = rs.getString("Cidade");
+                String fiscal = rs.getString("Fiscal");
+                String statusService = rs.getString("Situacao");
+                String expenditureType = rs.getString("TipoDespesa");
+
+                OrderService os = new OrderService(id, lote, alim, base, ServiceType.valueOf(serviceType), objTec, local, unlockKm, decript, registerDate);
+                os.setR(R);
+                for(String r : reservs){
+                    Reserv res = new Reserv(r);
+                   os.addReserv(res);
+                }
+              
+                os.setConclusionDate(conclusionDate);             
+                os.setCloseDate(closeDate);
+                os.setCity(city);
+                os.setFiscal(fiscal);
+                if(statusService != null)
+                     os.setStatusService(StatusService.valueOf(statusService));
+                if(expenditureType != null)
+                     os.setExpenditureType(ExpenditureType.valueOf(expenditureType));
+                
+                return os;
     }
     
 }

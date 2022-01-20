@@ -26,6 +26,7 @@ public class OrderService extends Service implements Serializable{
     private ExpenditureType expenditureType;
     private String r;
     
+    
     public OrderService(String id, String lote, String alim, String base, ServiceType serviceType, String technicalObject, String local, Double unlockKm, String description, Date registerDate) {
         super(id, registerDate, base);
         super.setAlim(alim);

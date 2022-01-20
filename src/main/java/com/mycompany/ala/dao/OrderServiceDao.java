@@ -6,6 +6,7 @@
 package com.mycompany.ala.dao;
 
 import com.mycompany.ala.entities.OrderService;
+import java.util.List;
 
 /**
  *
@@ -14,5 +15,5 @@ import com.mycompany.ala.entities.OrderService;
 public interface OrderServiceDao {
     void insertOrderService(OrderService os);
     boolean containsOrderService(String id);
-    
+    List<OrderService> findAllOpenServices();  
 }
