@@ -6,6 +6,7 @@
 package com.mycompany.ala.entities;
 
 import com.mycompany.ala.enums.ReservType;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,6 +16,7 @@ import java.util.List;
 public final class Reserv {
     private String id;
     private String receptor;
+    private Date needDate;
     private ReservType reservType;
     
     private List<Service> services;
@@ -44,6 +46,14 @@ public final class Reserv {
 
     public void setReceptor(String receptor) {
         this.receptor = receptor;
+    }
+
+    public Date getNeedDate() {
+        return needDate;
+    }
+
+    public void setNeedDate(Date needDate) {
+        this.needDate = needDate;
     }
 
     public ReservType getReservType() {

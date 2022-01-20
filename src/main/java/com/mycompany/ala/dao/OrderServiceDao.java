@@ -12,7 +12,7 @@ import com.mycompany.ala.entities.OrderService;
  * @author Abimael
  */
 public interface OrderServiceDao {
-    
-    boolean containsOrderService(OrderService os);
+    void insertOrderService(OrderService os);
+    boolean containsOrderService(String id);
     
 }

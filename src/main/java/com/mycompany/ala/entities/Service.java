@@ -22,6 +22,7 @@ public abstract class Service {
     
     private String id;
     private Date registerDate;//
+    private Date conclusionDate;
     private Date closeDate;//
     private String fiscal;//
     private String alim;
@@ -57,6 +58,14 @@ public abstract class Service {
         this.registerDate = registerDate;
     }
 
+    public Date getConclusionDate() {
+        return conclusionDate;
+    }
+
+    public void setConclusionDate(Date conclusionDate) {
+        this.conclusionDate = conclusionDate;
+    }
+    
     public Date getCloseDate() {
         return closeDate;
     }
@@ -117,7 +126,7 @@ public abstract class Service {
         logs.add(log);
     }
     
-    public String getReservs(){
+    public String getReservsId(){
         String reserv = "";
         for(Reserv r : reservs){
             reserv += r + " ";

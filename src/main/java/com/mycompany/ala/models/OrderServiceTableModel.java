@@ -55,7 +55,7 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
         if(columnIndex == 7)
             return services.get(rowIndex).getR();
         if(columnIndex == 8)
-            return services.get(rowIndex).getReservs();
+            return services.get(rowIndex).getReservsId();
         if(columnIndex == 9)
             return services.get(rowIndex).getServiceType();
         if(columnIndex == 10)

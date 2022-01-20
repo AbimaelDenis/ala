@@ -13,11 +13,13 @@ import com.mycompany.ala.entities.Reserv;
 
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
+import com.mycompany.ala.exceptions.DbException;
 import com.mycompany.ala.exceptions.ServiceException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,11 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 import java.util.function.Predicate;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
-
-
 /**
  *
  * @author Abimael
@@ -40,7 +37,9 @@ public final class OrderServiceService {
     private static OrderServiceDao osDao = DaoFactory.createOrderServiceDao();
     
     public static String importOrderServices(String path){
-        int sum = 0;
+        int registered = 0;
+        int noRegistered = 0;
+        int countLine = 0;
         try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"))){
            
             String line = br.readLine();          
@@ -62,26 +61,29 @@ public final class OrderServiceService {
                     }
                 }
                    
-                OrderService service = new OrderService(loadId(row[0]), row[1].trim(), row[2].trim(), 
+                OrderService service = new OrderService(loadId(row[0]), row[1].trim(), row[2].trim().replace(" ",""), 
                                                     row[3].trim(), ServiceType.valueOf(row[4].trim()), 
                                                     row[5], row[6], Double.parseDouble(row[7].replace(",", ".")), 
                                                     row[9], new Date());
                 service.setStatusService(StatusService.REGISTRADO);
                 loadReserv(service, row[8]);
-                if(osDao.containsOrderService(service)){
-                    throw new ServiceException("Arealdy exist! element in line: ");
-                }
+                if(registerInDataBase(service)){
+                    registered ++;
+                }else{
+                    noRegistered++;}
                 listeners.forEach(x -> x.onDataChange(service));
-                sum++;              
+                countLine++;              
             }          
         }catch(IOException e){
             System.out.print(e.getMessage());
         }catch(IllegalArgumentException e1){
             System.out.print(e1.getMessage());
         }catch(ServiceException e){
-            throw new ServiceException(e.getMessage() + (sum+1));
+            throw new ServiceException(e.getMessage() + (countLine+1));
+        }catch(DbException e){
+            System.out.println(e.getMessage() + (countLine+1));
         }
-        return "Importado " + sum + " serviços!";
+        return String.format("Registrados: %s \n Já registrados: %s", registered, noRegistered);
     }
     
     public List<OrderService> getOrderServices(Predicate<OrderService> filter){
@@ -127,5 +129,14 @@ public final class OrderServiceService {
         }else{
             orderService.setStatusService(StatusService.EMBARGADO);
         }
+    }
+    
+    private static boolean registerInDataBase(OrderService os) throws DbException{
+        if(osDao.containsOrderService(os.getId())){                   
+            return false;
+        }else{          
+             osDao.insertOrderService(os);       
+        }
+        return true;
     }
 }
