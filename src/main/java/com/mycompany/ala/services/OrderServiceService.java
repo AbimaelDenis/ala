@@ -15,24 +15,28 @@ import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
 import com.mycompany.ala.exceptions.ServiceException;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
+
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 
 import java.util.List;
+import java.util.Set;
 
 import java.util.function.Predicate;
+
 /**
  *
  * @author Abimael
  */
 public final class OrderServiceService {
-    
+    private static Set<OrderService> services = new LinkedHashSet<>();
     private static List<DataChangeListener> listeners = new ArrayList<>();
     private static OrderServiceDao osDao = DaoFactory.createOrderServiceDao();
     
@@ -67,13 +71,20 @@ public final class OrderServiceService {
                                                     row[9], new Date());
                 service.setStatusService(StatusService.REGISTRADO);
                 loadReserv(service, row[8]);
-                if(registerInDataBase(service)){
-                    registered ++;
-                }else{
-                    noRegistered++;}
-                listeners.forEach(x -> x.onDataChange(service));
+                if(osDao.containsOrderService(service.getId()))
+                    noRegistered++;
+                services.add(service);
                 countLine++;              
-            }          
+            }
+                          
+            for(OrderService service : services){
+                if(registerInDataBase(service)){
+                    registered++;                   
+                    listeners.forEach(x -> x.onDataChange(service));                   
+                }         
+            }
+            
+            
         }catch(IOException e){
             System.out.print(e.getMessage());
         }catch(IllegalArgumentException e1){
@@ -83,7 +94,7 @@ public final class OrderServiceService {
         }catch(DbException e){
             System.out.println(e.getMessage() + (countLine+1));
         }
-        return String.format("Registrados: %s \n Já registrados: %s", registered, noRegistered);
+        return String.format("Registrados: %s \n \n Já registrados: %s", registered, noRegistered);
     }
     
     public List<OrderService> getOrderServices(Predicate<OrderService> filter){
@@ -107,7 +118,7 @@ public final class OrderServiceService {
                     throw new ServiceException("Error of prefix for load Id in line: ");
                 newId[0] = newId[0].substring(5).trim();
                 Integer numberId = Integer.parseInt(newId[0]);
-                return prefix + " " +String.valueOf(numberId) + "/" + newId[1].trim();
+                return prefix + " " + String.valueOf(numberId) + "/" + newId[1].trim();
             }else{          
                 return null;
             }

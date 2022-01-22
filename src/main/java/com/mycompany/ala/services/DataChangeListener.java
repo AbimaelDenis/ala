@@ -6,6 +6,7 @@
 package com.mycompany.ala.services;
 
 import java.util.List;
+import javax.swing.JDialog;
 
 /**
  *
@@ -13,4 +14,5 @@ import java.util.List;
  */
 public interface DataChangeListener<T>{
     void onDataChange(T obj);
+    
 }

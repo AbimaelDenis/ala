@@ -8,6 +8,7 @@ package com.mycompany.ala.gui;
 
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
+import com.mycompany.ala.services.DataChangeListener;
 import com.mycompany.ala.services.OrderServiceService;
 
 import java.io.File;
@@ -22,9 +23,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Abimael
  */
 public class OrderServiceListView extends javax.swing.JFrame {
-
-    private OrderServiceTableModel model = new OrderServiceTableModel();
-    
+    private OrderServiceTableModel model = new OrderServiceTableModel(this);
+    private int count = 0;
     public OrderServiceListView() {
         initComponents();
         model.loadServicesList();
@@ -48,6 +48,8 @@ public class OrderServiceListView extends javax.swing.JFrame {
         btnConsult = new javax.swing.JButton();
         btnFilter = new javax.swing.JButton();
         btnImport = new javax.swing.JButton();
+        pbProgress = new javax.swing.JProgressBar();
+        lblProgress = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -127,18 +129,28 @@ public class OrderServiceListView extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pbProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblProgress, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(pbProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -187,7 +199,8 @@ public class OrderServiceListView extends javax.swing.JFrame {
         int result = fileChooser.showOpenDialog(null);
         if(result == JFileChooser.APPROVE_OPTION){
             path = fileChooser.getSelectedFile().getAbsolutePath();
-            OrderServiceService.subscribeDataChangeListener(model);
+            OrderServiceService.subscribeDataChangeListener(model);        
+           
             try{
                 JOptionPane.showMessageDialog(this, OrderServiceService.importOrderServices(path));
             }catch(ServiceException e){
@@ -195,6 +208,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
             }
         }
     }
+    
     /**
      * @param args the command line arguments
      */
@@ -231,6 +245,8 @@ public class OrderServiceListView extends javax.swing.JFrame {
                 new OrderServiceListView().setVisible(true);
             }
         });
+        
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -246,6 +262,10 @@ public class OrderServiceListView extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JLabel lblProgress;
+    private javax.swing.JProgressBar pbProgress;
     private javax.swing.JTable tbOrderServices;
     // End of variables declaration//GEN-END:variables
+
+   
 }

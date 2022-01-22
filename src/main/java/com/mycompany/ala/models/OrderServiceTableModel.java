@@ -7,10 +7,12 @@ package com.mycompany.ala.models;
 
 import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.entities.OrderService;
+
 import com.mycompany.ala.services.DataChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JFrame;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -18,9 +20,14 @@ import javax.swing.table.AbstractTableModel;
  * @author Abimael
  */
 public class OrderServiceTableModel extends AbstractTableModel implements DataChangeListener {
+    JFrame view = null;
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private static List<OrderService> services = new ArrayList<>();
     private String[] columns = {"Id", "Lote", "Alimentador", "Km", "Obj. Técnico", "Local", "Base", "Projeto", "Reservas", "Tipo", "Status", "Data de Registro"};
+    
+    public OrderServiceTableModel(JFrame view){
+        this.view = view;
+    }
     
     @Override
     public int getRowCount() {
@@ -67,8 +74,8 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
 
     @Override
     public void onDataChange(Object obj) {
-        if(obj instanceof OrderService){
-            services.add((OrderService) obj);
+        if(obj instanceof OrderService){          
+            services.add((OrderService) obj);                      
             this.fireTableDataChanged();
         }
     }
@@ -77,6 +84,10 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
         services = DaoFactory.createOrderServiceDao().findAllOpenServices();
         this.fireTableDataChanged();
     }
+    
+    
+
+   
 
     
     
