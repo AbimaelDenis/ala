@@ -9,38 +9,43 @@ import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
-
-
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
 import com.mycompany.ala.exceptions.ServiceException;
-
+import com.mycompany.ala.gui.ProgressInfoView;
+import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
-
 import java.util.List;
 import java.util.Set;
+import javax.swing.JOptionPane;
 
-import java.util.function.Predicate;
 
 /**
  *
  * @author Abimael
  */
-public final class OrderServiceService {
-    private static Set<OrderService> services = new LinkedHashSet<>();
-    private static List<DataChangeListener> listeners = new ArrayList<>();
+public class ImportServicesFromFile extends Thread {
+    private Component parentView;
+    private String path;
+    
+    private List<DataChangeListener> listeners = new ArrayList<>();
+    private Set<OrderService> services = new LinkedHashSet<>();
+    
     private static OrderServiceDao osDao = DaoFactory.createOrderServiceDao();
     
-    public static String importOrderServices(String path){
+    public ImportServicesFromFile(Component parentView, String path){
+        this.parentView = parentView;
+        this.path = path;
+    }
+    @Override
+    public void run() {
         int registered = 0;
         int noRegistered = 0;
         int countLine = 0;
@@ -64,7 +69,7 @@ public final class OrderServiceService {
                         line = br.readLine();                       
                     }
                 }
-                   
+                if(loadId(row[0]) == null) throw new ServiceException("Invalid Id in line: ");
                 OrderService service = new OrderService(loadId(row[0]), row[1].trim(), row[2].trim().replace(" ",""), 
                                                     row[3].trim(), ServiceType.valueOf(row[4].trim()), 
                                                     row[5], row[6], Double.parseDouble(row[7].replace(",", ".")), 
@@ -76,58 +81,55 @@ public final class OrderServiceService {
                 services.add(service);
                 countLine++;              
             }
-                          
+            
+            ProgressInfoView piv = new ProgressInfoView();
+            piv.setMaxValueToProgressBar(services.size());
+            piv.setTitle("Registrando no banco de dados");
+            
             for(OrderService service : services){
                 if(registerInDataBase(service)){
-                    registered++;                   
+                    registered++;                       
+                    piv.setValueToProgress(registered);
+                    piv.setTextInfo(service.getId());
                     listeners.forEach(x -> x.onDataChange(service));                   
                 }         
             }
             
-            
+            piv.dispose();
+            if(parentView != null)
+                JOptionPane.showMessageDialog(parentView, "Concluido. \n " + registered + " itens registrados com sucesso !");
+                        
         }catch(IOException e){
             System.out.print(e.getMessage());
         }catch(IllegalArgumentException e1){
             System.out.print(e1.getMessage());
-        }catch(ServiceException e){
-            throw new ServiceException(e.getMessage() + (countLine+1));
+        }catch(ServiceException e){          
+            System.out.print(e.getMessage() + (countLine+1));                      
         }catch(DbException e){
-            System.out.println(e.getMessage() + (countLine+1));
-        }
-        return String.format("Registrados: %s \n \n Já registrados: %s", registered, noRegistered);
+            System.out.print(e.getMessage() + (countLine+1));
+        }      
     }
     
-    public List<OrderService> getOrderServices(Predicate<OrderService> filter){
-        
-        return null;
-    }
-    
-    public static void subscribeDataChangeListener(DataChangeListener dcl){
-        if(!listeners.contains(dcl)){
-            listeners.add(dcl);
-        }    
-    }
-    
-    private static String loadId(String id) throws ServiceException {
+    private String loadId(String id) throws ServiceException {
         String prefix;
         String[] newId = id.split("/");
         try{
             if(newId[0].trim().replace(" ", "").length() > 5 && newId[1].length() == 4){
                 prefix = newId[0].replace(" ", "").trim().substring(0, 4);
                 if(prefix.matches("[+-]?\\d*(\\.\\d+)?") || prefix.matches(".*\\d.*")) //verifica se o prefix é um número ou contem algum
-                    throw new ServiceException("Error of prefix for load Id in line: ");
+                    throw new ServiceException("Error of prefix in loadId() in line: ");
                 newId[0] = newId[0].substring(5).trim();
                 Integer numberId = Integer.parseInt(newId[0]);
                 return prefix + " " + String.valueOf(numberId) + "/" + newId[1].trim();
-            }else{          
+            }else{ 
                 return null;
             }
         }catch(NumberFormatException e){
-             throw new ServiceException("Error in load Id: número de identificação contem letra(s)");
+             throw new ServiceException("Error in loadId(): número de identificação contem letra(s)");
         }
     }
     
-    private static void loadReserv(OrderService orderService, String reservs){
+    private void loadReserv(OrderService orderService, String reservs){
         if(reservs != null && !reservs.trim().equals("")){
             if(reservs.toUpperCase().trim().charAt(0) != 'R'){
                 String[] reserv = reservs.split("-");
@@ -142,7 +144,7 @@ public final class OrderServiceService {
         }
     }
     
-    private static boolean registerInDataBase(OrderService os) throws DbException{
+    private boolean registerInDataBase(OrderService os) throws DbException{
         if(osDao.containsOrderService(os.getId())){                   
             return false;
         }else{          
@@ -150,4 +152,11 @@ public final class OrderServiceService {
         }
         return true;
     }
+    
+    public void subscribeDataChangeListener(DataChangeListener dcl){
+        if(!listeners.contains(dcl)){
+            listeners.add(dcl);
+        }    
+    }
+
 }

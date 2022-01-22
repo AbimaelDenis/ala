@@ -8,10 +8,11 @@ package com.mycompany.ala.gui;
 
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
-import com.mycompany.ala.services.DataChangeListener;
-import com.mycompany.ala.services.OrderServiceService;
+import com.mycompany.ala.services.ImportServicesFromFile;
+
 
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -48,8 +49,6 @@ public class OrderServiceListView extends javax.swing.JFrame {
         btnConsult = new javax.swing.JButton();
         btnFilter = new javax.swing.JButton();
         btnImport = new javax.swing.JButton();
-        pbProgress = new javax.swing.JProgressBar();
-        lblProgress = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -132,13 +131,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
             .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(pbProgress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblProgress, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -146,11 +139,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(pbProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblProgress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -199,13 +188,11 @@ public class OrderServiceListView extends javax.swing.JFrame {
         int result = fileChooser.showOpenDialog(null);
         if(result == JFileChooser.APPROVE_OPTION){
             path = fileChooser.getSelectedFile().getAbsolutePath();
-            OrderServiceService.subscribeDataChangeListener(model);        
-           
-            try{
-                JOptionPane.showMessageDialog(this, OrderServiceService.importOrderServices(path));
-            }catch(ServiceException e){
-                JOptionPane.showMessageDialog(this, e.getMessage());
-            }
+                                             
+            ImportServicesFromFile isff = new ImportServicesFromFile(this, path);
+            isff.subscribeDataChangeListener(model); 
+            isff.start();
+                      
         }
     }
     
@@ -262,8 +249,6 @@ public class OrderServiceListView extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JLabel lblProgress;
-    private javax.swing.JProgressBar pbProgress;
     private javax.swing.JTable tbOrderServices;
     // End of variables declaration//GEN-END:variables
 

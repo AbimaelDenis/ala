@@ -60,15 +60,7 @@
           <Component id="jToolBar1" alignment="0" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="680" max="32767" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="pbProgress" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="lblProgress" min="-2" pref="67" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
+              <Component id="jScrollPane1" pref="680" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -78,12 +70,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="jToolBar1" min="-2" pref="30" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="291" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="pbProgress" max="32767" attributes="0"/>
-                  <Component id="lblProgress" max="32767" attributes="0"/>
-              </Group>
+              <Component id="jScrollPane1" pref="309" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -153,9 +140,5 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JProgressBar" name="pbProgress">
-    </Component>
-    <Component class="javax.swing.JLabel" name="lblProgress">
-    </Component>
   </SubComponents>
 </Form>
