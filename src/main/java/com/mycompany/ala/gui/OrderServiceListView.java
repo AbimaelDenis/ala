@@ -9,10 +9,13 @@ package com.mycompany.ala.gui;
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
 import com.mycompany.ala.services.ImportServicesFromFile;
+import com.mycompany.ala.util.DefaultFileChooser;
+import java.awt.Component;
 
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -147,7 +150,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        // TODO add your handling code here:
+        createOrderServiceFormView(null);
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
@@ -155,9 +158,33 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnFilterActionPerformed
 
     private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
-        //OrderServiceFormView osfv = new OrderServiceFormView(new OrderServiceListView(), true);
-        JDialog osfv = new JDialog(this, true);      
-        OrderServiceFormView view = new OrderServiceFormView();   
+        createOrderServiceFormView(form ->{
+            form.setEditable(false);
+        });
+    }//GEN-LAST:event_btnConsultActionPerformed
+
+    private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
+        importServicesFromFile();
+    }//GEN-LAST:event_btnImportActionPerformed
+    private void importServicesFromFile(){  
+        JFileChooser fc = DefaultFileChooser.createFileChooser();
+        int result = fc.showOpenDialog(null);
+        if(result == JFileChooser.APPROVE_OPTION){
+           String path = fc.getSelectedFile().getAbsolutePath();
+                                             
+            ImportServicesFromFile isff = new ImportServicesFromFile(this, path);
+            isff.subscribeDataChangeListener(model); 
+            isff.start();                      
+        }
+    }
+    
+    private void createOrderServiceFormView(Consumer<OrderServiceFormView> con){
+        JDialog osfv = new JDialog(this, true);
+        osfv.setResizable(false);
+        OrderServiceFormView view = new OrderServiceFormView(); 
+        if(con != null){
+            con.accept(view);
+        }
         osfv.setContentPane(view.getContentPane());
         
         osfv.setSize(view.getSize());
@@ -166,34 +193,6 @@ public class OrderServiceListView extends javax.swing.JFrame {
         osfv.setLocationRelativeTo(null);
         osfv.setVisible(true);
         
-        //exibir no centro da tela
-    }//GEN-LAST:event_btnConsultActionPerformed
-
-    private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
-        importServicesFromFile();
-    }//GEN-LAST:event_btnImportActionPerformed
-    private void importServicesFromFile(){
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Aquivos de texto (.txt)", "txt");
-        
-        String baseDirectory = System.getProperty("user.home") + "/Desktop";
-        File dir = new File(baseDirectory);
-        
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(dir);
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.addChoosableFileFilter(filter);
-        String path = "";
-        
-        int result = fileChooser.showOpenDialog(null);
-        if(result == JFileChooser.APPROVE_OPTION){
-            path = fileChooser.getSelectedFile().getAbsolutePath();
-                                             
-            ImportServicesFromFile isff = new ImportServicesFromFile(this, path);
-            isff.subscribeDataChangeListener(model); 
-            isff.start();
-                      
-        }
     }
     
     /**
