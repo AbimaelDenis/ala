@@ -6,6 +6,7 @@
 package com.mycompany.ala.gui;
 
 
+import com.mycompany.ala.enums.OrderServiceFormType;
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
 import com.mycompany.ala.services.ImportServicesFromFile;
@@ -109,7 +110,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnImport);
 
-        jMenu1.setText("File");
+        jMenu1.setText("Serviços");
 
         jMenuItem1.setText("Ordem de Serviço");
         jMenu1.add(jMenuItem1);
@@ -122,7 +123,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
+        jMenu2.setText("Sobre");
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -150,7 +151,9 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        createOrderServiceFormView(null);
+        createOrderServiceFormView(form ->{
+            form.setMode(OrderServiceFormType.NEW);
+        });
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
@@ -159,7 +162,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
 
     private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
         createOrderServiceFormView(form ->{
-            form.setEditable(false);
+            form.setMode(OrderServiceFormType.CONSULT_MODE);
         });
     }//GEN-LAST:event_btnConsultActionPerformed
 

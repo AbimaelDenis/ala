@@ -9,10 +9,9 @@ package com.mycompany.ala.enums;
  *
  * @author Abimael
  */
-public enum ServiceType {
-    ESTRUTURAL,
-    MELHORIA,
-    NDS,
-    PODA,
-    TERMOGRÁFICA;   
+public enum OrderServiceFormType {
+    CONSULT_MODE,
+    EDIT_MODE,
+    NEW,
+    EMBARG_MODE;
 }

@@ -5,14 +5,27 @@
  */
 package com.mycompany.ala.gui;
 
-import com.mycompany.ala.util.JTextFieldListener;
+import com.mycompany.ala.enums.OrderServiceFormType;
+import com.mycompany.ala.util.DoubleConstraint;
+import com.mycompany.ala.util.JSpinnerListener;
+import com.mycompany.ala.util.MaxLengthConstraint;
+import com.mycompany.ala.util.OnlyIntNumberConstraint;
+import com.mycompany.ala.util.SpecialCharConstraint;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.awt.event.KeyEvent;
+
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 
 import javax.swing.SpinnerDateModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
@@ -20,19 +33,14 @@ import javax.swing.SpinnerDateModel;
  * @author Abimael
  */
 public class OrderServiceFormView extends javax.swing.JFrame {
-
+    private Map<String, String> invalidFields = new HashMap<>();
+    private OrderServiceFormType osft = null;
     /**
      * Creates new form OrderServiceFormView
      */
     public OrderServiceFormView() {     
-        initComponents();  
-  
-        ((JSpinner.DateEditor) spinnerCreateDate.getEditor()).getTextField().addKeyListener(new JTextFieldListener(){
-            @Override
-            public void keyPressed(KeyEvent e) {
-                e.consume();
-            }
-        });    
+        initComponents();
+        configFields();      
     }
 
     /**
@@ -58,7 +66,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         lblRegisterOwner = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         txtFiscal = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
+        btnLog = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         txtAlim = new javax.swing.JTextField();
         txtObjTec = new javax.swing.JTextField();
@@ -75,20 +83,29 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         jLabel23 = new javax.swing.JLabel();
-        txtConclusion = new javax.swing.JTextField();
-        txtClose = new javax.swing.JTextField();
-        jButton5 = new javax.swing.JButton();
+        btnEdit = new javax.swing.JButton();
         Date date = new Date();
         SpinnerDateModel sm = new SpinnerDateModel(date, null, null, Calendar.DAY_OF_YEAR);
         spinnerCreateDate = new javax.swing.JSpinner(sm);
+        cbCreateDate = new javax.swing.JCheckBox();
+        SpinnerDateModel smConclusion = new SpinnerDateModel(date, null, null, Calendar.DAY_OF_YEAR);
+        spinnerConclusion = new javax.swing.JSpinner(smConclusion);
+        SpinnerDateModel smClose = new SpinnerDateModel(date, null, null, Calendar.DAY_OF_YEAR);
+        spinnerClose = new javax.swing.JSpinner(smClose);
+        txtReserv = new javax.swing.JTextField();
+        btnAddReserv = new javax.swing.JButton();
+        jLabel11 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        tbMaterialRequest = new javax.swing.JTable();
+        tbReserv = new javax.swing.JTable();
         btnMaterialRequest = new javax.swing.JButton();
         btnNewProg = new javax.swing.JButton();
         btnProgEdit = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         tbProg = new javax.swing.JTable();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tbMaterialRequest1 = new javax.swing.JTable();
+        btnRemoveReserv = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -158,7 +175,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("Log");
+        btnLog.setText("Log");
 
         jLabel3.setBackground(new java.awt.Color(0, 0, 0));
         jLabel3.setForeground(new java.awt.Color(100, 100, 100));
@@ -200,14 +217,14 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         });
 
-        comboBoxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "ESTRUTURAL", "MELHORIA", "NDS", "PODA", "TERMOGRÁFICA" }));
         comboBoxType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxTypeActionPerformed(evt);
             }
         });
 
-        comboBoxExpenditure.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxExpenditure.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "CUSTEIO", "INVESTIMENTO" }));
 
         jLabel15.setBackground(new java.awt.Color(0, 0, 0));
         jLabel15.setForeground(new java.awt.Color(100, 100, 100));
@@ -217,7 +234,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jLabel16.setForeground(new java.awt.Color(100, 100, 100));
         jLabel16.setText("Faturamento");
 
-        comboBoxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboBoxStatus.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "REGISTRADO", "CONTRATADO", "PROGRAMADO", "INICIADO", "CONCLUIDO", "ATUALIZADO", "PROTOCOLADO", "ENCERRADO", "EMBARGADO", "CANCELADO" }));
 
         jLabel17.setBackground(new java.awt.Color(0, 0, 0));
         jLabel17.setForeground(new java.awt.Color(100, 100, 100));
@@ -231,29 +248,49 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jLabel23.setForeground(new java.awt.Color(100, 100, 100));
         jLabel23.setText("Encerramento");
 
-        txtConclusion.setEditable(false);
-        txtConclusion.addActionListener(new java.awt.event.ActionListener() {
+        btnEdit.setText("Editar");
+        btnEdit.setFocusable(false);
+        btnEdit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEdit.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtConclusionActionPerformed(evt);
+                btnEditActionPerformed(evt);
             }
         });
-
-        txtClose.setEditable(false);
-        txtClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCloseActionPerformed(evt);
-            }
-        });
-
-        jButton5.setText("Editar");
-        jButton5.setFocusable(false);
-        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton5.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         JSpinner.DateEditor de = new JSpinner.DateEditor(spinnerCreateDate, "dd/MM/yyyy");
         //de.getTextField().setFocusable(false);
 
         spinnerCreateDate.setEditor(de);
+        spinnerCreateDate.setEnabled(false);
+
+        cbCreateDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbCreateDateActionPerformed(evt);
+            }
+        });
+
+        //de.getTextField().setFocusable(false);
+        JSpinner.DateEditor deConclusion = new JSpinner.DateEditor(spinnerConclusion, "dd/MM/yyyy");
+        spinnerConclusion.setEditor(deConclusion);
+        spinnerConclusion.setEnabled(false);
+
+        //de.getTextField().setFocusable(false);
+        JSpinner.DateEditor deClose = new JSpinner.DateEditor(spinnerClose, "dd/MM/yyyy");
+        spinnerClose.setEditor(deClose);
+        spinnerClose.setEnabled(false);
+
+        txtReserv.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtReservActionPerformed(evt);
+            }
+        });
+
+        btnAddReserv.setText("Add");
+
+        jLabel11.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel11.setForeground(new java.awt.Color(100, 100, 100));
+        jLabel11.setText("Reserva");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -263,41 +300,9 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel16)
-                            .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel22, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(comboBoxType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(comboBoxExpenditure, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(comboBoxStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel17)
-                            .addComponent(jLabel23))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtConclusion)
-                            .addComponent(txtClose, javax.swing.GroupLayout.Alignment.TRAILING)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton3)
+                        .addComponent(btnLog)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton5))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel21)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel5)
-                            .addComponent(jLabel9))
-                        .addGap(7, 7, 7)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtAlim)
-                            .addComponent(txtObjTec)
-                            .addComponent(txtLocal)
-                            .addComponent(txtKm)
-                            .addComponent(txtFiscal)))
+                        .addComponent(btnEdit))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -309,23 +314,65 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblRegisterOwner))
                             .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel16)
+                                    .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel22, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(comboBoxType, 0, 170, Short.MAX_VALUE)
+                                    .addComponent(comboBoxExpenditure, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(comboBoxStatus, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel21)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel9))
+                                .addGap(7, 7, 7)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(txtLocal, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtObjTec, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtAlim, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtFiscal, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtKm, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(11, 11, 11)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel18)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(cbCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel10)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel1))
-                                        .addGap(7, 7, 7)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                    .addComponent(jLabel10)
+                                                    .addComponent(jLabel4)
+                                                    .addComponent(jLabel1))
+                                                .addGap(7, 7, 7))
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel11)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                             .addComponent(txtLote, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
                                             .addComponent(txtR)
-                                            .addComponent(txtId))))))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                            .addComponent(txtId)
+                                            .addComponent(txtReserv))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnAddReserv))))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel17)
+                                    .addComponent(jLabel23))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(spinnerConclusion, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(spinnerClose))))
+                        .addGap(0, 4, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -339,7 +386,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
                     .addComponent(lblRegisterOwner))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -354,11 +401,17 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(txtR, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(8, 8, 8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAddReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel11))
+                .addGap(4, 4, 4)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel18)
-                    .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel21)
                     .addComponent(txtFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -378,7 +431,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(txtKm, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(comboBoxType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel15))
@@ -393,21 +446,21 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel17)
-                    .addComponent(txtConclusion, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(spinnerConclusion, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel23)
-                    .addComponent(txtClose, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                    .addComponent(spinnerClose, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(btnLog, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         jPanel5.setBackground(new java.awt.Color(220, 220, 220));
 
-        tbMaterialRequest.setModel(new javax.swing.table.DefaultTableModel(
+        tbReserv.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -418,7 +471,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane3.setViewportView(tbMaterialRequest);
+        jScrollPane3.setViewportView(tbReserv);
 
         btnMaterialRequest.setText("Requisitar");
 
@@ -439,6 +492,21 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         ));
         jScrollPane4.setViewportView(tbProg);
 
+        tbMaterialRequest1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane5.setViewportView(tbMaterialRequest1);
+
+        btnRemoveReserv.setText("Remover");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -446,16 +514,19 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                    .addComponent(jScrollPane4)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnProgEdit))
-                            .addComponent(btnMaterialRequest))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(btnMaterialRequest)
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnRemoveReserv)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -466,11 +537,15 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnProgEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(btnMaterialRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnMaterialRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -494,7 +569,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     .addComponent(jScrollPane2)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabel20)
-                        .addGap(0, 729, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
@@ -567,28 +642,72 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_comboBoxTypeActionPerformed
 
-    private void txtConclusionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtConclusionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtConclusionActionPerformed
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        if(osft != OrderServiceFormType.NEW){
+            setMode(OrderServiceFormType.EDIT_MODE);
+        }else{
+            validateFields();
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
 
-    private void txtCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCloseActionPerformed
+    private void cbCreateDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCreateDateActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtCloseActionPerformed
+    }//GEN-LAST:event_cbCreateDateActionPerformed
+
+    private void txtReservActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtReservActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtReservActionPerformed
     
-    public void setEditable(boolean editable){
-        txtId.setEditable(editable);
-        txtLote.setEditable(editable);
-        txtR.setEditable(editable);   
-        spinnerCreateDate.setEnabled(editable);
-        txtFiscal.setEditable(editable);
-        txtAlim.setEditable(editable);
-        txtObjTec.setEditable(editable);
-        txtLocal.setEditable(editable);
-        txtKm.setEditable(editable);
-        comboBoxType.setEditable(editable);
-        comboBoxType.setEnabled(editable);
-        comboBoxExpenditure.setEnabled(editable);
-        comboBoxStatus.setEnabled(editable);
+    public void setMode(OrderServiceFormType osft){
+        this.osft = osft;
+        switch(osft){
+            case CONSULT_MODE:
+                txtId.setEditable(false);
+                enabledComponents(false);
+                break;
+            case EDIT_MODE:
+                txtId.setEditable(false);
+                enabledComponents(true);
+                btnMaterialRequest.setEnabled(false);
+                btnNewProg.setEnabled(false);
+                btnProgEdit.setEnabled(false);
+                btnEdit.setText("Confirmar");
+                break;
+            case NEW:
+                btnEdit.setText("Confirmar");
+                btnMaterialRequest.setEnabled(false);
+                btnNewProg.setEnabled(false);
+                btnProgEdit.setEnabled(false);
+                btnLog.setEnabled(false);
+                lblRegisterDate.setText("");
+                break;              
+            case EMBARG_MODE:
+                txtId.setEditable(false);
+                enabledComponents(false);
+                btnMaterialRequest.setEnabled(false);
+                btnNewProg.setEnabled(false);
+                btnProgEdit.setEnabled(false);
+                break;           
+            default:               
+        }
+    }
+    
+    private void enabledComponents(boolean enabled){
+        txtLote.setEditable(enabled);
+        txtR.setEditable(enabled);
+        txtReserv.setEnabled(enabled);
+        btnAddReserv.setEnabled(enabled);
+        btnRemoveReserv.setEnabled(enabled);
+        txtFiscal.setEditable(enabled);
+        txtAlim.setEditable(enabled);
+        txtObjTec.setEditable(enabled);
+        txtLocal.setEditable(enabled);
+        txtKm.setEditable(enabled);
+        comboBoxType.setEditable(enabled);
+        comboBoxType.setEnabled(enabled);
+        comboBoxExpenditure.setEnabled(enabled);
+        comboBoxStatus.setEnabled(enabled);
+        taDescript.setEditable(enabled);
     }
     /**
      * @param args the command line arguments
@@ -626,16 +745,20 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddReserv;
+    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnLog;
     private javax.swing.JButton btnMaterialRequest;
     private javax.swing.JButton btnNewProg;
     private javax.swing.JButton btnProgEdit;
+    private javax.swing.JButton btnRemoveReserv;
+    private javax.swing.JCheckBox cbCreateDate;
     private javax.swing.JComboBox<String> comboBoxExpenditure;
     private javax.swing.JComboBox<String> comboBoxStatus;
     private javax.swing.JComboBox<String> comboBoxType;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
@@ -657,15 +780,17 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblRegisterDate;
     private javax.swing.JLabel lblRegisterOwner;
+    private javax.swing.JSpinner spinnerClose;
+    private javax.swing.JSpinner spinnerConclusion;
     private javax.swing.JSpinner spinnerCreateDate;
     private javax.swing.JTextArea taDescript;
-    private javax.swing.JTable tbMaterialRequest;
+    private javax.swing.JTable tbMaterialRequest1;
     private javax.swing.JTable tbProg;
+    private javax.swing.JTable tbReserv;
     private javax.swing.JTextField txtAlim;
-    private javax.swing.JTextField txtClose;
-    private javax.swing.JTextField txtConclusion;
     private javax.swing.JTextField txtFiscal;
     private javax.swing.JTextField txtId;
     private javax.swing.JTextField txtKm;
@@ -673,5 +798,85 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JTextField txtLote;
     private javax.swing.JTextField txtObjTec;
     private javax.swing.JTextField txtR;
+    private javax.swing.JTextField txtReserv;
     // End of variables declaration//GEN-END:variables
+
+    private boolean validateFields() {
+        System.out.println("validatefields()");
+
+            String id = txtId.getText();
+            String Lote = txtLote.getText();
+            String R = txtR.getText();
+            String createDate = "";
+            
+            if(cbCreateDate.isSelected()){
+                createDate = spinnerCreateDate.getValue().toString();
+            }
+            
+            String fiscal = txtFiscal.getText();
+            String alim = txtAlim.getText();
+            String objTec = txtObjTec.getText();
+            String local = txtLocal.getText();
+            String km = txtKm.getText();
+            
+            String type = comboBoxType.getSelectedItem().toString();
+            String expenditureType = comboBoxExpenditure.getSelectedItem().toString();
+            String status = comboBoxStatus.getSelectedItem().toString();
+     
+        return true;
+    }
+
+    private void configFields() {
+        txtId.setDocument(new MaxLengthConstraint(15));      
+        txtLote.setDocument(new OnlyIntNumberConstraint(7));
+        txtR.setDocument(new OnlyIntNumberConstraint(6)); 
+        txtReserv.setDocument(new OnlyIntNumberConstraint(9));
+        txtFiscal.setDocument(new MaxLengthConstraint(40));            
+        txtAlim.setDocument(new MaxLengthConstraint(9));     
+        txtObjTec.setDocument(new SpecialCharConstraint(8));      
+        txtLocal.setDocument(new SpecialCharConstraint(8));  
+        txtKm.setDocument(new DoubleConstraint(8));
+        
+        //spinnerCreateDate
+        JTextField txtCreateDate = ((JSpinner.DateEditor) spinnerCreateDate.getEditor()).getTextField();      
+        JSpinnerListener.setFixedLength(txtCreateDate, txtCreateDate.getText().length());
+        JSpinnerListener.setDateChangeListener(spinnerCreateDate);
+        
+        //spinnerConclusion
+        JTextField txtConclusion = ((JSpinner.DateEditor) spinnerConclusion.getEditor()).getTextField();
+        JSpinnerListener.setFixedLength(txtConclusion, txtConclusion.getText().length());
+        JSpinnerListener.setDateChangeListener(spinnerConclusion);
+        
+        //spinnerClose
+        JTextField txtClose = ((JSpinner.DateEditor) spinnerClose.getEditor()).getTextField();
+        JSpinnerListener.setFixedLength(txtClose, txtClose.getText().length());
+        JSpinnerListener.setDateChangeListener(spinnerClose);
+        
+        cbCreateDate.addChangeListener(new ChangeListener(){
+            @Override
+            public void stateChanged(ChangeEvent e){
+                if(cbCreateDate.isSelected())
+                    spinnerCreateDate.setEnabled(true);
+                else
+                    spinnerCreateDate.setEnabled(false);
+            }     
+        });
+            
+        comboBoxStatus.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+               if(comboBoxStatus.getSelectedItem().toString().equals("CONCLUIDO")){
+                   spinnerConclusion.setEnabled(true);
+                   spinnerClose.setEnabled(false);
+               }else if(comboBoxStatus.getSelectedItem().toString().equals("ENCERRADO")){
+                   spinnerClose.setEnabled(true);
+                   spinnerConclusion.setEnabled(false);
+               }else{
+                   spinnerConclusion.setEnabled(false);
+                   spinnerClose.setEnabled(false);
+               }
+            }
+        });
+                     
+        
+    }
 }

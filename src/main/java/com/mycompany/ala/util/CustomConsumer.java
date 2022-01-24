@@ -3,16 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.ala.enums;
+package com.mycompany.ala.util;
+
+import java.util.function.Consumer;
 
 /**
  *
  * @author Abimael
  */
-public enum ServiceType {
-    ESTRUTURAL,
-    MELHORIA,
-    NDS,
-    PODA,
-    TERMOGRÁFICA;   
+public interface CustomConsumer<T, R>{   
+    void accept(T t, R r);
 }
