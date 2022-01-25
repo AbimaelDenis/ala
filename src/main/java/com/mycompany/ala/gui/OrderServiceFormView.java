@@ -6,6 +6,9 @@
 package com.mycompany.ala.gui;
 
 import com.mycompany.ala.enums.OrderServiceFormType;
+import com.mycompany.ala.models.ProgTableModel;
+import com.mycompany.ala.models.RequestTableModel;
+import com.mycompany.ala.models.ReservTableModel;
 import com.mycompany.ala.util.DoubleConstraint;
 import com.mycompany.ala.util.JSpinnerListener;
 import com.mycompany.ala.util.MaxLengthConstraint;
@@ -22,6 +25,7 @@ import java.util.Map;
 
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 
 import javax.swing.SpinnerDateModel;
 import javax.swing.event.ChangeEvent;
@@ -35,12 +39,18 @@ import javax.swing.event.ChangeListener;
 public class OrderServiceFormView extends javax.swing.JFrame {
     private Map<String, String> invalidFields = new HashMap<>();
     private OrderServiceFormType osft = null;
+    private ProgTableModel progTableModel = new ProgTableModel();
+    private RequestTableModel requestTableModel = new RequestTableModel();
+    private ReservTableModel reservTableModel = new ReservTableModel();
     /**
      * Creates new form OrderServiceFormView
      */
     public OrderServiceFormView() {     
         initComponents();
-        configFields();      
+        configFields(); 
+        tbProg.setModel(progTableModel);
+        tbMaterialRequest.setModel(requestTableModel);
+        tbReserv.setModel(reservTableModel);
     }
 
     /**
@@ -104,7 +114,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         tbProg = new javax.swing.JTable();
         jScrollPane5 = new javax.swing.JScrollPane();
-        tbMaterialRequest1 = new javax.swing.JTable();
+        tbMaterialRequest = new javax.swing.JTable();
         btnRemoveReserv = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
@@ -451,7 +461,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel23)
                     .addComponent(spinnerClose, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnLog, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
@@ -492,7 +502,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         ));
         jScrollPane4.setViewportView(tbProg);
 
-        tbMaterialRequest1.setModel(new javax.swing.table.DefaultTableModel(
+        tbMaterialRequest.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -503,7 +513,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane5.setViewportView(tbMaterialRequest1);
+        jScrollPane5.setViewportView(tbMaterialRequest);
 
         btnRemoveReserv.setText("Remover");
 
@@ -515,18 +525,19 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnProgEdit))
-                            .addComponent(btnMaterialRequest)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(btnRemoveReserv)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnMaterialRequest))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnRemoveReserv)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(btnProgEdit)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -537,15 +548,15 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnProgEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnMaterialRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnMaterialRequest, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -590,15 +601,17 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -787,7 +800,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JSpinner spinnerConclusion;
     private javax.swing.JSpinner spinnerCreateDate;
     private javax.swing.JTextArea taDescript;
-    private javax.swing.JTable tbMaterialRequest1;
+    private javax.swing.JTable tbMaterialRequest;
     private javax.swing.JTable tbProg;
     private javax.swing.JTable tbReserv;
     private javax.swing.JTextField txtAlim;
@@ -827,6 +840,10 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     }
 
     private void configFields() {
+        tbProg.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tbMaterialRequest.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tbReserv.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
         txtId.setDocument(new MaxLengthConstraint(15));      
         txtLote.setDocument(new OnlyIntNumberConstraint(7));
         txtR.setDocument(new OnlyIntNumberConstraint(6)); 
@@ -875,8 +892,6 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                    spinnerClose.setEnabled(false);
                }
             }
-        });
-                     
-        
+        });                           
     }
 }

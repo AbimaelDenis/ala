@@ -9,18 +9,17 @@ package com.mycompany.ala.entities;
  *
  * @author Abimael
  */
-public final class Material {
+public abstract class Material {
     private String code;
-    private String description;
-    private Double budgetQuantity;
+    private String description;  
     private Double dispatchedQauntity;
-    private Reserv reserv;
+    private String units;
+    
 
-    public Material(String code, String description, Double budgetQuantity, Reserv reserv) {
+    public Material(String code, String description, String units) {
         this.code = code;
         this.description = description;
-        this.budgetQuantity = budgetQuantity;
-        this.reserv = reserv;
+        this.units = units;
     }
 
     public String getCode() {
@@ -38,15 +37,7 @@ public final class Material {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    public Double getBudgetQuantity() {
-        return budgetQuantity;
-    }
-
-    public void setBudgetQuantity(Double budgetQuantity) {
-        this.budgetQuantity = budgetQuantity;
-    }
-
+  
     public Double getDispatchedQauntity() {
         return dispatchedQauntity;
     }
@@ -55,12 +46,13 @@ public final class Material {
         this.dispatchedQauntity += dispatchedQauntity;
     }
 
-    public Reserv getReserv() {
-        return reserv;
+    public String getUnits() {
+        return units;
     }
 
-    public void setReserv(Reserv reserv) {
-        this.reserv = reserv;
+    public void setUnits(String units) {
+        this.units = units;
     }
- 
+    
+    
 }

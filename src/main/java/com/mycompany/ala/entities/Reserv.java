@@ -6,6 +6,7 @@
 package com.mycompany.ala.entities;
 
 import com.mycompany.ala.enums.ReservType;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +22,7 @@ public final class Reserv {
     private ReservType reservType;
     
     private Service service;
-    private List<Material> materials;
+    private List<BudgetMaterial> budgetMaterials = new ArrayList<>();
     
      public Reserv(String id) {
         this.id = id;
@@ -73,8 +74,8 @@ public final class Reserv {
         this.service = service;
     }
     
-    public void addMaterial(Material material){
-        materials.add(material);
+    public void addMaterial(BudgetMaterial material){
+        budgetMaterials.add(material);
     }
 
     @Override

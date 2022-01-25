@@ -1,18 +1,17 @@
- /*
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package com.mycompany.ala.gui;
 
-
 import com.mycompany.ala.enums.OrderServiceFormType;
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
+import com.mycompany.ala.services.ImportSAPServicesData;
 import com.mycompany.ala.services.ImportServicesFromFile;
 import com.mycompany.ala.util.DefaultFileChooser;
 import java.awt.Component;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -28,12 +28,15 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  * @author Abimael
  */
 public class OrderServiceListView extends javax.swing.JFrame {
+
     private OrderServiceTableModel model = new OrderServiceTableModel(this);
     private int count = 0;
+
     public OrderServiceListView() {
         initComponents();
         model.loadServicesList();
         tbOrderServices.setModel(model);
+        tbOrderServices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setLocationRelativeTo(null);
     }
 
@@ -53,6 +56,8 @@ public class OrderServiceListView extends javax.swing.JFrame {
         btnConsult = new javax.swing.JButton();
         btnFilter = new javax.swing.JButton();
         btnImport = new javax.swing.JButton();
+        btnSap = new javax.swing.JButton();
+        btnExport = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -110,6 +115,22 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnImport);
 
+        btnSap.setText("SAP");
+        btnSap.setFocusable(false);
+        btnSap.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSap.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSapActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnSap);
+
+        btnExport.setText("Exportar");
+        btnExport.setFocusable(false);
+        btnExport.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnExport.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
         jMenu1.setText("Serviços");
 
         jMenuItem1.setText("Ordem de Serviço");
@@ -132,18 +153,24 @@ public class OrderServiceListView extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnExport)
+                .addGap(16, 16, 16))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -151,7 +178,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        createOrderServiceFormView(form ->{
+        createOrderServiceFormView(form -> {
             form.setMode(OrderServiceFormType.NEW);
         });
     }//GEN-LAST:event_btnNewActionPerformed
@@ -161,7 +188,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnFilterActionPerformed
 
     private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
-        createOrderServiceFormView(form ->{
+        createOrderServiceFormView(form -> {
             form.setMode(OrderServiceFormType.CONSULT_MODE);
         });
     }//GEN-LAST:event_btnConsultActionPerformed
@@ -169,35 +196,47 @@ public class OrderServiceListView extends javax.swing.JFrame {
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
         importServicesFromFile();
     }//GEN-LAST:event_btnImportActionPerformed
-    private void importServicesFromFile(){  
+
+    private void btnSapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSapActionPerformed
         JFileChooser fc = DefaultFileChooser.createFileChooser();
         int result = fc.showOpenDialog(null);
-        if(result == JFileChooser.APPROVE_OPTION){
-           String path = fc.getSelectedFile().getAbsolutePath();
-                                             
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String path = fc.getSelectedFile().getAbsolutePath();
+            
+            ImportSAPServicesData issd = new ImportSAPServicesData(this, path);
+            issd.subscribeDataChangeListener(model);
+            issd.start();         
+        }
+    }//GEN-LAST:event_btnSapActionPerformed
+    private void importServicesFromFile() {
+        JFileChooser fc = DefaultFileChooser.createFileChooser();
+        int result = fc.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            String path = fc.getSelectedFile().getAbsolutePath();
+
             ImportServicesFromFile isff = new ImportServicesFromFile(this, path);
-            isff.subscribeDataChangeListener(model); 
-            isff.start();                      
+            isff.subscribeDataChangeListener(model);
+            isff.start();
         }
     }
-    
-    private void createOrderServiceFormView(Consumer<OrderServiceFormView> con){
+
+    private void createOrderServiceFormView(Consumer<OrderServiceFormView> con) {
         JDialog osfv = new JDialog(this, true);
         osfv.setResizable(false);
-        OrderServiceFormView view = new OrderServiceFormView(); 
-        if(con != null){
+        OrderServiceFormView view = new OrderServiceFormView();
+        if (con != null) {
             con.accept(view);
         }
         osfv.setContentPane(view.getContentPane());
-        
+
         osfv.setSize(view.getSize());
         osfv.setTitle("Ordem de Serviço");
         osfv.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         osfv.setLocationRelativeTo(null);
         osfv.setVisible(true);
-        
+
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -234,15 +273,16 @@ public class OrderServiceListView extends javax.swing.JFrame {
                 new OrderServiceListView().setVisible(true);
             }
         });
-        
-        
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConsult;
+    private javax.swing.JButton btnExport;
     private javax.swing.JButton btnFilter;
     private javax.swing.JButton btnImport;
     private javax.swing.JButton btnNew;
+    private javax.swing.JButton btnSap;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -254,5 +294,4 @@ public class OrderServiceListView extends javax.swing.JFrame {
     private javax.swing.JTable tbOrderServices;
     // End of variables declaration//GEN-END:variables
 
-   
 }

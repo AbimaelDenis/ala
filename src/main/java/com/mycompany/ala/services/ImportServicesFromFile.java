@@ -134,7 +134,9 @@ public class ImportServicesFromFile extends Thread {
             if(reservs.toUpperCase().trim().charAt(0) != 'R'){
                 String[] reserv = reservs.split("-");
                 for(String r : reserv){
-                    orderService.addReserv(new Reserv(r.trim()));     
+                    Reserv res = new Reserv(r.trim());
+                    res.setService(orderService);
+                    orderService.addReserv(res);     
                 }
             }else{
                 orderService.setR(reservs.trim());

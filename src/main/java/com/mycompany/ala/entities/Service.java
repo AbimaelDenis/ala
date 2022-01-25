@@ -32,6 +32,7 @@ public abstract class Service {
     private ServiceType serviceType;
     private StatusService statusService;//
     
+    private Request request;
     private List<Log> logs = new ArrayList<>();//
     private List<Reserv> reservs = new ArrayList<>();
     private List<Prog> progs = new ArrayList<>();//
@@ -132,6 +133,15 @@ public abstract class Service {
             reserv += r + " ";
         }
         return reserv;
+    }
+    
+    public Reserv getReservById(String id){
+        for(Reserv r : reservs){
+            if(r.getId().equals(id)){
+                return r;
+            }
+        }
+        return null;
     }
     
     public void addReserv(Reserv reserv){

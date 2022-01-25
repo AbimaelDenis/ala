@@ -28,9 +28,11 @@ public class OnlyIntNumberConstraint extends PlainDocument{
 
         String oldValue = getText(0, getLength());
         int newLength = oldValue.length() + str.length(); 
-        if(str.matches("[+-]?\\d*(\\.\\d+)?") && newLength <= maxLength){
-            super.insertString(offs, str , attr);
-        }
+        if(newLength <= maxLength){        
+            if(str.matches("[0-9]")){
+                super.insertString(offs, str, attr);
+            }
+        }  
                        
     }
     
