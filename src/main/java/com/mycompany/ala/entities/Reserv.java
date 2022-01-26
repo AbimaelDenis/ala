@@ -78,6 +78,16 @@ public final class Reserv {
         budgetMaterials.add(material);
     }
 
+    public List<BudgetMaterial> getBudgetMaterials() {
+        return budgetMaterials;
+    }
+
+    public void setBudgetMaterials(List<BudgetMaterial> budgetMaterials) {
+        this.budgetMaterials = budgetMaterials;
+    }
+    
+    
+
     @Override
     public int hashCode() {
         int hash = 3;

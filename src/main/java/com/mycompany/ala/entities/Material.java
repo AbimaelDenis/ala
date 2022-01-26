@@ -5,6 +5,8 @@
  */
 package com.mycompany.ala.entities;
 
+import java.util.Date;
+
 /**
  *
  * @author Abimael
@@ -12,9 +14,8 @@ package com.mycompany.ala.entities;
 public abstract class Material {
     private String code;
     private String description;  
-    private Double dispatchedQauntity;
+    private Double dispatchedQauntity;  
     private String units;
-    
 
     public Material(String code, String description, String units) {
         this.code = code;
@@ -42,10 +43,10 @@ public abstract class Material {
         return dispatchedQauntity;
     }
 
-    public void dispatchMaterial(Double dispatchedQauntity) {
-        this.dispatchedQauntity += dispatchedQauntity;
+    public void setDispatchedQauntity(Double dispatchedQauntity) {
+        this.dispatchedQauntity = dispatchedQauntity;
     }
-
+    
     public String getUnits() {
         return units;
     }
@@ -53,6 +54,4 @@ public abstract class Material {
     public void setUnits(String units) {
         this.units = units;
     }
-    
-    
 }

@@ -9,6 +9,7 @@ import com.mycompany.ala.enums.OrderServiceFormType;
 import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
 import com.mycompany.ala.services.ImportSAPServicesData;
+import com.mycompany.ala.services.ImportSAPServicesData2;
 import com.mycompany.ala.services.ImportServicesFromFile;
 import com.mycompany.ala.util.DefaultFileChooser;
 import java.awt.Component;
@@ -203,7 +204,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
             
-            ImportSAPServicesData issd = new ImportSAPServicesData(this, path);
+            ImportSAPServicesData2 issd = new ImportSAPServicesData2(this, path);
             issd.subscribeDataChangeListener(model);
             issd.start();         
         }

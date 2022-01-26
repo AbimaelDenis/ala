@@ -10,8 +10,10 @@ package com.mycompany.ala.enums;
  * @author Abimael
  */
 public enum ReservType {
+    T201,
     T221,
     T222,
+    T901,
     T921,
     T922;
 }
