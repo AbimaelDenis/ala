@@ -139,7 +139,9 @@ public class ImportServicesFromFile extends Thread {
                     orderService.addReserv(res);     
                 }
             }else{
-                orderService.setR(reservs.trim());
+                int r = Integer.parseInt(reservs.trim().replace("R", "").replace("-", ""));
+                orderService.setR(String.valueOf(r));
+                orderService.setStatusService(StatusService.EMBARGADO);
             }
         }else{
             orderService.setStatusService(StatusService.EMBARGADO);

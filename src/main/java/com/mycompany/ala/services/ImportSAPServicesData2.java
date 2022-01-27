@@ -10,7 +10,10 @@ import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.entities.BudgetMaterial;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
+import com.mycompany.ala.enums.ExpenditureType;
 import com.mycompany.ala.enums.ReservType;
+import com.mycompany.ala.enums.ServiceType;
+import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
 import com.mycompany.ala.util.CustomConsumer;
 import java.awt.Component;
@@ -62,8 +65,13 @@ public class ImportSAPServicesData2 extends Thread {
                         if(f[0] != null && f[0].trim().length() > 0)
                             x.setR(f[0].trim().substring(2, 9));
                     });
-
+                if(os.getR() == null || os.getR().trim().length() == 0)
+                    os.setExpenditureType(ExpenditureType.CUSTEIO);
+                else
+                    os.setExpenditureType(ExpenditureType.INVESTIMENTO);
+                
                 System.out.println("OS: " + os.getId() + "->" + os.getR());
+                                                    
                 }else if(os.getR() != null && os.getR().trim().length() > 0) {                   
                     Set<Reserv> reservs = new HashSet();
                     String[] fields;
@@ -71,7 +79,9 @@ public class ImportSAPServicesData2 extends Thread {
                         fields = line.split(";");
                         
                         if(fields[0].trim().length() > 5){
-                            if (os.getR().substring(2).equals(fields[0].trim().substring(3, 9))) {
+                            int r1 = Integer.parseInt(os.getR().trim());
+                            int r2 = Integer.parseInt(fields[0].trim().substring(3, 9));
+                            if (r1 == r2) {
                                 Reserv res = new Reserv(fields[3].trim());
                                 res.setService(os);
                                 reservs.add(res);
@@ -81,9 +91,15 @@ public class ImportSAPServicesData2 extends Thread {
                     for(Reserv r : reservs){
                         os.addReserv(r);
                     }
-                    updateOrderService(os, (x, y) -> {}); 
+                                     
+                    if(os.getReservsId().trim() == null || os.getReservsId().trim().length() > 0) 
+                        os.setStatusService(StatusService.EMBARGADO);
+                    else{ 
+                        os.setExpenditureType(ExpenditureType.INVESTIMENTO);
+                        updateOrderService(os, (x, y) -> {}); 
+                    }
                     System.out.println("Projeto: " + os.getR() + "->" + os.getReservsId());
-                }
+                }               
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -92,7 +108,7 @@ public class ImportSAPServicesData2 extends Thread {
         } catch (NullPointerException e) {
             e.printStackTrace();           
         }catch(ParseException e){
-                        
+            System.out.println(e.getMessage());            
         }catch (NumberFormatException e){
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -116,7 +132,8 @@ public class ImportSAPServicesData2 extends Thread {
                             fields[7].trim(),
                             Double.parseDouble(budgetQuantity.replace(".", "")),
                             currentReserv);
-                    bm.setDispatchedQauntity(Double.parseDouble(fields[16].trim()));
+                    String dispatchedQuantity = fields[13].trim().replace(".", "");
+                    bm.setDispatchedQauntity(Double.parseDouble(dispatchedQuantity.replace(",", ".")));
                     if (currentReserv.getNeedDate() == null) {
                         currentReserv.setNeedDate(sdf.parse(fields[9].trim().replace(".", "/")));
                     }
@@ -126,7 +143,14 @@ public class ImportSAPServicesData2 extends Thread {
                     if (currentReserv.getReservType() == null) {
                         currentReserv.setReservType(ReservType.valueOf("T" + fields[5].trim()));
                     }
-                    
+                    if(os.getCity() == null || os.getCity().trim().length() == 0 && fields[2].trim().length() > 0)
+                        os.setCity(fields[2].trim());                   
+                    if(fields[1].trim().contains("MULT") || fields[1].trim().contains("DV CKT"))
+                        os.setServiceType(ServiceType.MELHORIA);
+                    if(fields[1].trim().length() > 0){
+                        String descript = os.getDescription();
+                        os.setDescription(fields[1].trim() + "\n\n" + descript);
+                    }                    
                     materials.add(bm);
                 }
             }
