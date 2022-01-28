@@ -16,4 +16,5 @@ public interface OrderServiceDao {
     void insertOrderService(OrderService os);
     boolean containsOrderService(String id);
     List<OrderService> findAllOpenServices();  
+    void updateSapCheck(OrderService os);
 }

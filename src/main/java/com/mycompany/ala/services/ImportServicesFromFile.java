@@ -9,6 +9,7 @@ import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
+import com.mycompany.ala.enums.ExpenditureType;
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
@@ -55,7 +56,7 @@ public class ImportServicesFromFile extends Thread {
                     line = br.readLine();
                            
             while(line != null && !line.trim().equals("END")){
-                String[] row = line.split(";");
+                String[] column = line.split(";");
                 
                 line = br.readLine();
                 while(line == null || line.length() == 0){  
@@ -63,19 +64,23 @@ public class ImportServicesFromFile extends Thread {
                 }
                
                 while(!line.contains(";") && !line.trim().equals("END")){                   
-                    row[9] += "\n " + line.trim();                                        
+                    column[9] += "\n " + line.trim();                  
                     line = br.readLine(); 
                     while(line == null || line.length() == 0){
                         line = br.readLine();                       
                     }
                 }
-                if(loadId(row[0]) == null) throw new ServiceException("Invalid Id in line: ");
-                OrderService service = new OrderService(loadId(row[0]), row[1].trim(), row[2].trim().replace(" ",""), 
-                                                    row[3].trim(), ServiceType.valueOf(row[4].trim()), 
-                                                    row[5], row[6], Double.parseDouble(row[7].replace(",", ".")), 
-                                                    row[9], new Date());
+                System.out.println(column[0]);
+                if(loadId(column[0]) == null) throw new ServiceException("Invalid Id in line: ");
+                OrderService service = new OrderService(loadId(column[0]), column[1].trim(), column[2].trim().replace(" ",""), 
+                                                    column[3].trim(), ServiceType.valueOf(column[4].trim().replace(" ", "_")), 
+                                                    column[5], column[6],  
+                                                    column[9], new Date());
+                
+                if(column[7].trim() != null && column[7].trim().length() > 0 && column[7].trim().replace(",", "").replace(".", "").matches("[+-]?\\d*(\\.\\d+)?"))
+                    service.setUnlockKm(Double.parseDouble(column[7].replace(",", ".")));
                 service.setStatusService(StatusService.REGISTRADO);
-                loadReserv(service, row[8]);
+                loadReserv(service, column[8]);
                 if(osDao.containsOrderService(service.getId()))
                     noRegistered++;
                 services.add(service);
@@ -100,13 +105,17 @@ public class ImportServicesFromFile extends Thread {
                 JOptionPane.showMessageDialog(parentView, "Concluido. \n " + registered + " itens registrados com sucesso !");
                         
         }catch(IOException e){
-            System.out.print(e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(parentView, e.getMessage());
         }catch(IllegalArgumentException e1){
-            System.out.print(e1.getMessage());
-        }catch(ServiceException e){          
-            System.out.print(e.getMessage() + (countLine+1));                      
+            e1.printStackTrace();
+            JOptionPane.showMessageDialog(parentView, e1.getMessage());
+        }catch(ServiceException e){
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(parentView, e.getMessage());                      
         }catch(DbException e){
-            System.out.print(e.getMessage() + (countLine+1));
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(parentView, e.getMessage());
         }      
     }
     
@@ -134,14 +143,21 @@ public class ImportServicesFromFile extends Thread {
             if(reservs.toUpperCase().trim().charAt(0) != 'R'){
                 String[] reserv = reservs.split("-");
                 for(String r : reserv){
-                    Reserv res = new Reserv(r.trim());
-                    res.setService(orderService);
-                    orderService.addReserv(res);     
+                    if(r.trim().length() > 4 && r.trim().matches("[+-]?\\d*(\\.\\d+)?")){
+                        r.replace(" ", "");
+                        Reserv res = new Reserv(r.trim());
+                        res.setService(orderService);
+                        orderService.addReserv(res);   
+                    }
                 }
+                orderService.setExpenditureType(ExpenditureType.CUSTEIO);
             }else{
-                int r = Integer.parseInt(reservs.trim().replace("R", "").replace("-", ""));
-                orderService.setR(String.valueOf(r));
+                if(reservs.trim().replace("R", "").replace("-", "").matches("[+-]?\\d*(\\.\\d+)?")){
+                    int r = Integer.parseInt(reservs.trim().replace("R", "").replace("-", ""));
+                    orderService.setR(String.valueOf(r));
+                }
                 orderService.setStatusService(StatusService.EMBARGADO);
+                orderService.setExpenditureType(ExpenditureType.INVESTIMENTO);
             }
         }else{
             orderService.setStatusService(StatusService.EMBARGADO);

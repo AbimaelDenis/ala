@@ -70,8 +70,13 @@ public class ImportSAPServicesData2 extends Thread {
                 else
                     os.setExpenditureType(ExpenditureType.INVESTIMENTO);
                 
-                System.out.println("OS: " + os.getId() + "->" + os.getR());
-                                                    
+                System.out.println("OS: " + os.getId() + "->" + os.getReservsId());
+                String[] a = os.getReservsId().split(" ");
+                for(String s : a){
+                    os.getReservById(s).getBudgetMaterials().forEach(bm -> System.out.println(bm.getReserv().getId()));
+                }
+                osDao.updateSapCheck(os);
+                
                 }else if(os.getR() != null && os.getR().trim().length() > 0) {                   
                     Set<Reserv> reservs = new HashSet();
                     String[] fields;
@@ -91,13 +96,16 @@ public class ImportSAPServicesData2 extends Thread {
                     for(Reserv r : reservs){
                         os.addReserv(r);
                     }
-                                     
-                    if(os.getReservsId().trim() == null || os.getReservsId().trim().length() > 0) 
+                     
+                    
+                    if(os.getReservsId().trim() == null || os.getReservsId().trim().length() > 0){ 
                         os.setStatusService(StatusService.EMBARGADO);
-                    else{ 
-                        os.setExpenditureType(ExpenditureType.INVESTIMENTO);
+                    }else{ 
+                        os.setExpenditureType(ExpenditureType.INVESTIMENTO);                    
+                        os.setStatusService(StatusService.REGISTRADO);
                         updateOrderService(os, (x, y) -> {}); 
                     }
+                    osDao.updateSapCheck(os);
                     System.out.println("Projeto: " + os.getR() + "->" + os.getReservsId());
                 }               
             }
@@ -121,7 +129,8 @@ public class ImportSAPServicesData2 extends Thread {
         for (String resId : res) {
             List<BudgetMaterial> materials = new ArrayList<>();
             Reserv currentReserv = os.getReservById(resId);
-            
+            if(currentReserv.getService() == null)
+                currentReserv.setService(os);
             for (String line : lines) { //////////
                 fields = line.split(";");
                 
@@ -146,7 +155,7 @@ public class ImportSAPServicesData2 extends Thread {
                     if(os.getCity() == null || os.getCity().trim().length() == 0 && fields[2].trim().length() > 0)
                         os.setCity(fields[2].trim());                   
                     if(fields[1].trim().contains("MULT") || fields[1].trim().contains("DV CKT"))
-                        os.setServiceType(ServiceType.MELHORIA);
+                        os.setServiceType(ServiceType.PLANO_DE_MELHORIAS);
                     if(fields[1].trim().length() > 0){
                         String descript = os.getDescription();
                         os.setDescription(fields[1].trim() + "\n\n" + descript);

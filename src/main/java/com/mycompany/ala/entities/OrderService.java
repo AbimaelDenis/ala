@@ -27,15 +27,14 @@ public class OrderService extends Service implements Serializable{
     private String r;
     
     
-    public OrderService(String id, String lote, String alim, String base, ServiceType serviceType, String technicalObject, String local, Double unlockKm, String description, Date registerDate) {
+    public OrderService(String id, String lote, String alim, String base, ServiceType serviceType, String technicalObject, String local, String description, Date registerDate) {
         super(id, registerDate, base);
         super.setAlim(alim);
         super.setServiceType(serviceType);
         this.lote = lote;
         this.description = description;
         this.technicalObject = technicalObject;
-        this.local = local;  
-        this.unlockKm = unlockKm;
+        this.local = local;         
     }
 
     public Date getCreateDate() {
