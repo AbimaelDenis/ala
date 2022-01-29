@@ -8,7 +8,7 @@ package com.mycompany.ala.gui;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.enums.OrderServiceFormType;
 import com.mycompany.ala.models.OrderServiceTableModel;
-import com.mycompany.ala.services.ImportSAPServicesData2;
+import com.mycompany.ala.services.ImportSAPServicesData;
 import com.mycompany.ala.services.ImportServicesFromFile;
 import com.mycompany.ala.util.DefaultFileChooser;
 
@@ -29,7 +29,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
 
     public OrderServiceListView() {
         initComponents();
-        model.updateServicesList();
+        model.onDataChange(null);
         tbOrderServices.setModel(model);
         tbOrderServices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setLocationRelativeTo(null);
@@ -197,11 +197,11 @@ public class OrderServiceListView extends javax.swing.JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
 
-            ImportSAPServicesData2 importSapServicesData = new ImportSAPServicesData2(this, path);
+            ImportSAPServicesData importSapServicesData = new ImportSAPServicesData(this, path);
             importSapServicesData.subscribeDataChangeListener(model);
             importSapServicesData.start();
 
-            model.updateServicesList();
+            //model.onDataChange(null);
 
         }
     }//GEN-LAST:event_btnSapActionPerformed

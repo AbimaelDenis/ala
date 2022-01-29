@@ -96,14 +96,14 @@ public class ImportServicesFromFile extends Thread {
                     registered++;                       
                     proogressInfoView.setValueToProgress(registered);
                     proogressInfoView.setTextInfo(service.getId());
-                    listeners.forEach(x -> x.onDataChange(service));                   
+                                       
                 }         
             }
             
             proogressInfoView.dispose();
             if(parentView != null)
                 JOptionPane.showMessageDialog(parentView, "Concluido. \n " + registered + " itens registrados com sucesso !");
-                        
+            listeners.forEach(x -> x.onDataChange(null));           
         }catch(IOException e){
             e.printStackTrace();
             JOptionPane.showMessageDialog(parentView, e.getMessage());
@@ -141,7 +141,7 @@ public class ImportServicesFromFile extends Thread {
     private void loadReserv(OrderService orderService, String reservs){
         if(reservs != null && !reservs.trim().equals("")){
             if(reservs.toUpperCase().trim().charAt(0) != 'R'){
-                String[] reserv = reservs.split("-");
+                String[] reserv = reservs.trim().split("-");
                 for(String r : reserv){
                     if(r.trim().length() > 4 && r.trim().matches("[+-]?\\d*(\\.\\d+)?")){
                         r.replace(" ", "");
@@ -150,6 +150,7 @@ public class ImportServicesFromFile extends Thread {
                         orderService.addReserv(res);   
                     }
                 }
+                if(orderService.getReservsId().trim().length() == 0) orderService.setEmbarg(true);
                 orderService.setExpenditureType(ExpenditureType.CUSTEIO);
             }else{
                 if(reservs.trim().replace("R", "").replace("-", "").matches("[+-]?\\d*(\\.\\d+)?")){

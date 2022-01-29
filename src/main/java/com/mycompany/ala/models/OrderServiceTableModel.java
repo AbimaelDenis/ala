@@ -20,7 +20,7 @@ import javax.swing.table.AbstractTableModel;
  * @author Abimael
  */
 public class OrderServiceTableModel extends AbstractTableModel implements DataChangeListener {
-    JFrame view = null;
+    private JFrame view = null;
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private static List<OrderService> services = new ArrayList<>();
     private String[] columns = {"Id", "Lote", "Alimentador", "Km", "Obj. Técnico", "Local", "Base", "Projeto", "Reservas", "Tipo", "Status", "Data de Registro"};
@@ -74,16 +74,14 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
 
     @Override
     public void onDataChange(Object obj) {
-        if(obj instanceof OrderService){          
-            services.add((OrderService) obj);                      
-            this.fireTableDataChanged();
-        }
-    }
-    
-    public void updateServicesList(){ 
         services = DaoFactory.createOrderServiceDao().findAllOpenServices();
         this.fireTableDataChanged();
     }
+    
+//    public void updateServicesList(){ 
+//        services = DaoFactory.createOrderServiceDao().findAllOpenServices();
+//        this.fireTableDataChanged();
+//    }
     
     public OrderService getOrderService(int index){
         return services.get(index);
