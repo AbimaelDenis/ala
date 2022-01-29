@@ -5,7 +5,6 @@
  */
 package com.mycompany.ala.util;
 
-import java.util.function.Consumer;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -25,11 +24,11 @@ public class OnlyIntNumberConstraint extends PlainDocument{
     public void insertString(int offs, String str, AttributeSet attr) throws BadLocationException {
 
         if (str == null) return;  
-
+              
         String oldValue = getText(0, getLength());
         int newLength = oldValue.length() + str.length(); 
-        if(newLength <= maxLength){        
-            if(str.matches("[0-9]")){
+        if(newLength <= maxLength){
+            if(str.matches("[+-]?\\d*(\\.\\d+)?")){
                 super.insertString(offs, str, attr);
             }
         }  

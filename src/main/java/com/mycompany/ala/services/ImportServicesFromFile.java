@@ -87,20 +87,20 @@ public class ImportServicesFromFile extends Thread {
                 countLine++;              
             }
             
-            ProgressInfoView piv = new ProgressInfoView();
-            piv.setMaxValueToProgressBar(services.size());
-            piv.setTitle("Registrando no banco de dados");
+            ProgressInfoView proogressInfoView = new ProgressInfoView();
+            proogressInfoView.setMaxValueToProgressBar(services.size());
+            proogressInfoView.setTitle("Registrando no banco de dados");
             
             for(OrderService service : services){
                 if(registerInDataBase(service)){
                     registered++;                       
-                    piv.setValueToProgress(registered);
-                    piv.setTextInfo(service.getId());
+                    proogressInfoView.setValueToProgress(registered);
+                    proogressInfoView.setTextInfo(service.getId());
                     listeners.forEach(x -> x.onDataChange(service));                   
                 }         
             }
             
-            piv.dispose();
+            proogressInfoView.dispose();
             if(parentView != null)
                 JOptionPane.showMessageDialog(parentView, "Concluido. \n " + registered + " itens registrados com sucesso !");
                         
@@ -156,11 +156,11 @@ public class ImportServicesFromFile extends Thread {
                     int r = Integer.parseInt(reservs.trim().replace("R", "").replace("-", ""));
                     orderService.setR(String.valueOf(r));
                 }
-                orderService.setStatusService(StatusService.EMBARGADO);
+                orderService.setEmbarg(true);
                 orderService.setExpenditureType(ExpenditureType.INVESTIMENTO);
             }
         }else{
-            orderService.setStatusService(StatusService.EMBARGADO);
+            orderService.setEmbarg(true);
         }
     }
     

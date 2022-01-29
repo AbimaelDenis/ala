@@ -11,6 +11,7 @@ import com.mycompany.ala.entities.BudgetMaterial;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
 import com.mycompany.ala.enums.ExpenditureType;
+import com.mycompany.ala.enums.ReservType;
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
@@ -21,7 +22,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -67,8 +70,8 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             st = conn.prepareStatement("INSERT INTO orderservice (Id, Lote, Alimentador, Base, "
                     + "Tipo, ObjetoTecnico, Localizacao, Km, R, Reserva, Descricao, "
                     + "DataRegistro, DataConclusao, DataEncerramento, Cidade, Fiscal, "
-                    + "Situacao, TipoDespesa) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "Situacao, TipoDespesa, Embargado) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             st.setString(1, os.getId());
             st.setString(2, os.getLote());
@@ -107,7 +110,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             } else {
                 st.setDate(18, null);
             }
-
+            st.setBoolean(19, os.isEmbarg());
             int rowsAffected = st.executeUpdate();
         } catch (SQLException e) {
             throw new DbException("Error in insertOrderService(): " + e.getMessage());
@@ -128,7 +131,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             rs = st.executeQuery("SELECT*FROM orderservice WHERE Situacao != 'ENCERRADO'");
 
             while (rs.next()) {
-                services.add(instantiateOrderService(rs));
+                services.add(instantiateOrderService(rs));             
             }
             return services;
         } catch (SQLException e) {
@@ -158,12 +161,14 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         String fiscal = rs.getString("Fiscal");
         String statusService = rs.getString("Situacao");
         String expenditureType = rs.getString("TipoDespesa");
+        boolean embarg = rs.getBoolean("Embargado");
 
         OrderService os = new OrderService(id, lote, alim, base, ServiceType.valueOf(serviceType), objTec, local, decript, registerDate);
         os.setUnlockKm(unlockKm);
         os.setR(R);
         for (String r : reservs) {
             Reserv res = new Reserv(r);
+            res.setService(os);
             os.addReserv(res);
         }
 
@@ -177,7 +182,17 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         if (expenditureType != null) {
             os.setExpenditureType(ExpenditureType.valueOf(expenditureType));
         }
-
+        os.setEmbarg(embarg);
+        
+        
+        for(Reserv r : findReservByServiceId(os.getId())){
+            for(Reserv res : os.getReservs()){
+                if(r.getId().trim().equals(res.getId().trim())){
+                   res = r;                 
+                }
+            }
+        }
+        
         return os;
     }
 
@@ -187,7 +202,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
 
         try {
             st = conn.prepareStatement("UPDATE orderservice SET Tipo = ?, R = ?, Reserva = ?, Descricao = ?, "
-                    + "Cidade = ?, Situacao = ?, TipoDespesa = ? WHERE Id = ?");
+                    + "Cidade = ?, Situacao = ?, TipoDespesa = ?, Embargado = ? WHERE Id = ?");
 
             st.setString(1, String.valueOf(os.getServiceType()));
             st.setString(2, os.getR());
@@ -196,13 +211,17 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             st.setString(5, os.getCity());
             st.setString(6, String.valueOf(os.getStatusService()));
             st.setString(7, String.valueOf(os.getExpenditureType()));
-            st.setString(8, os.getId());
-
+            st.setBoolean(8, os.isEmbarg());
+            st.setString(9, os.getId());
+           
+            System.out.println(os.getReservsId());
             st.executeUpdate();
 
             String[] reserv = os.getReservsId().split(" ");
             for (String r : reserv) {
                 if (reserv.length > 0 && reserv != null) {
+                    conn.setAutoCommit(false);
+                    //deleteReservByServiceId(os.getId());
                     List<BudgetMaterial> materials = os.getReservById(r).getBudgetMaterials();
                     for (BudgetMaterial bm : materials) {
                         st = conn.prepareStatement("INSERT INTO budgetmaterial (Reserva, Codigo, Descricao, Unidade, "
@@ -223,15 +242,80 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
                         st.executeUpdate();
                     }
                 }
+                conn.commit();
             }
 
             int rowsAffected = st.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DbException("Error in updateSapCheck(): " + e.getMessage());
+            try{
+                conn.rollback();
+                throw new DbException("Transaction rolled back. Error in updateSapCheck(): " + e.getMessage());
+            }catch(SQLException e1){
+                throw new DbException("Error trying to rollback. Error in updateSapCheck(): " + e.getMessage());
+            }
         } finally {
             DB.closeStatement(st);
         }
     }
-
+    
+    @Override
+    public Set<Reserv> findReservByServiceId(String id){
+        Set<Reserv> reservs = new HashSet<>();
+        List<BudgetMaterial> budgetMaterials = new ArrayList<>();
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try{
+            st = conn.prepareStatement("SELECT*FROM budgetmaterial WHERE Servico = ?");
+            
+            st.setString(1, id.trim());
+            
+            rs = st.executeQuery();
+            
+            while(rs.next()){
+                String reservId = rs.getString("Reserva");
+                String code = rs.getString("Codigo");
+                String descrip = rs.getString("Descricao");
+                String unit = rs.getString("Unidade");
+                Double budgetQuantity = rs.getDouble("Orcado");
+                Double dispatchedQuantity = rs.getDouble("Atendido");
+                Date needDate = rs.getDate("DataNecessidade");
+                String receptor = rs.getString("Recebedor");
+                ReservType type = ReservType.valueOf(rs.getString("Tipo"));
+                
+                Reserv r = new Reserv(reservId, receptor, needDate, type);
+                reservs.add(r);
+                BudgetMaterial bm = new BudgetMaterial(code, descrip, unit, budgetQuantity, r);
+                bm.setDispatchedQauntity(dispatchedQuantity);
+                budgetMaterials.add(bm);
+            }
+            
+            for(Reserv r : reservs){
+                for(BudgetMaterial bm : budgetMaterials){
+                    if(bm.getReserv().getId().trim().equals(r.getId())){
+                        r.addMaterial(bm);
+                    }
+                }
+            }
+            return reservs;         
+        }catch(SQLException e){
+            throw new DbException("Error in findReservByServiceId(): " + e.getMessage());
+        }finally{
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);          
+        }   
+    }
+    
+    @Override
+    public void deleteReservByServiceId(String id){
+        PreparedStatement st = null;
+        
+        try{
+            st = conn.prepareStatement("DELETE FROM budgetMaterial WHERE Servico = ?");
+            
+            st.setString(1, id);           
+            st.executeUpdate();
+        }catch(SQLException e){
+            throw new DbException("Error in deleteReservByServiceId(): " + e.getMessage());
+        }
+    }
 }

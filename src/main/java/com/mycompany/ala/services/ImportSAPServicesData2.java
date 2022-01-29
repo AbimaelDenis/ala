@@ -15,6 +15,7 @@ import com.mycompany.ala.enums.ReservType;
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
+import com.mycompany.ala.gui.ProgressInfoView;
 import com.mycompany.ala.util.CustomConsumer;
 import java.awt.Component;
 import java.io.BufferedReader;
@@ -31,13 +32,14 @@ import java.util.Set;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Abimael
  */
-public class ImportSAPServicesData2 extends Thread {   
+public class ImportSAPServicesData2 extends Thread {
+
     List<String> lines;
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private String path;
@@ -51,76 +53,89 @@ public class ImportSAPServicesData2 extends Thread {
     }
 
     @Override
-    public void run() {
-        
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"))) {
-            Stream<String> str = br.lines();
-            this.lines = str.collect(Collectors.toList());
-            this.lines.remove(0);
-                       
-            List<OrderService> openServices = osDao.findAllOpenServices();
-            for (OrderService os : openServices) {               
-                if (os.getReservsId() != null && os.getReservsId().trim().length() > 0) {                    
-                    updateOrderService(os, (x, f) -> {
-                        if(f[0] != null && f[0].trim().length() > 0)
-                            x.setR(f[0].trim().substring(2, 9));
-                    });
-                if(os.getR() == null || os.getR().trim().length() == 0)
-                    os.setExpenditureType(ExpenditureType.CUSTEIO);
-                else
-                    os.setExpenditureType(ExpenditureType.INVESTIMENTO);
-                
-                System.out.println("OS: " + os.getId() + "->" + os.getReservsId());
-                String[] a = os.getReservsId().split(" ");
-                for(String s : a){
-                    os.getReservById(s).getBudgetMaterials().forEach(bm -> System.out.println(bm.getReserv().getId()));
-                }
-                osDao.updateSapCheck(os);
-                
-                }else if(os.getR() != null && os.getR().trim().length() > 0) {                   
-                    Set<Reserv> reservs = new HashSet();
-                    String[] fields;
-                    for (String line : lines) {
-                        fields = line.split(";");
-                        
-                        if(fields[0].trim().length() > 5){
-                            int r1 = Integer.parseInt(os.getR().trim());
-                            int r2 = Integer.parseInt(fields[0].trim().substring(3, 9));
-                            if (r1 == r2) {
-                                Reserv res = new Reserv(fields[3].trim());
-                                res.setService(os);
-                                reservs.add(res);
+    public void run() {      
+            ProgressInfoView progressInfoView = new ProgressInfoView();
+            progressInfoView.setInderterminate(true);
+            progressInfoView.setTitle("Carregando materiais");
+            progressInfoView.setVisible(true);
+            
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"))) {
+                Stream<String> str = br.lines();
+                this.lines = str.collect(Collectors.toList());
+                this.lines.remove(0);
+
+                List<OrderService> openServices = osDao.findAllOpenServices();
+                for (OrderService os : openServices) {
+                    
+                    if (os.getReservsId() != null && os.getReservsId().trim().length() > 0) {
+                        updateOrderService(os, (x, f) -> {
+                            if (f[0] != null && f[0].trim().length() > 0) {
+                                x.setR(f[0].trim().substring(2, 9));
+                            }
+                        });
+                        if (os.getR() == null || os.getR().trim().length() == 0) {
+                            os.setExpenditureType(ExpenditureType.CUSTEIO);
+                        } else {
+                            os.setExpenditureType(ExpenditureType.INVESTIMENTO);
+                        }
+
+                        System.out.println("OS: " + os.getId() + "->" + os.getReservsId());
+                        //String[] a = os.getReservsId().split(" ");
+                        //for (String s : a) {
+                            //os.getReservById(s).getBudgetMaterials().forEach(bm -> System.out.println(bm.getReserv().getId()));
+                        //}
+                        osDao.updateSapCheck(os);
+
+                    } else if (os.getR() != null && os.getR().trim().length() > 0) {
+                        Set<Reserv> reservs = new HashSet();
+                        String[] fields;
+                        for (String line : lines) {
+                            fields = line.split(";");
+
+                            if (fields[0].trim().length() > 5) {
+                                int r1 = Integer.parseInt(os.getR().trim());
+                                int r2 = Integer.parseInt(fields[0].trim().substring(3, 9));
+                                if (r1 == r2) {
+                                    Reserv res = new Reserv(fields[3].trim());
+                                    res.setService(os);
+                                    reservs.add(res);
+                                }
                             }
                         }
+                        for (Reserv r : reservs) {
+                            os.addReserv(r);
+                        }
+
+                        if (os.getReservsId().trim() == null || !(os.getReservsId().trim().length() > 0)) {
+                            os.setEmbarg(true);
+                        } else {
+                            os.setExpenditureType(ExpenditureType.INVESTIMENTO);
+                            os.setStatusService(StatusService.REGISTRADO);
+                            updateOrderService(os, (x, y) -> {
+                            });
+                        }
+                        osDao.updateSapCheck(os);
+                        System.out.println("Projeto: " + os.getR() + "->" + os.getReservsId());
                     }
-                    for(Reserv r : reservs){
-                        os.addReserv(r);
-                    }
-                     
-                    
-                    if(os.getReservsId().trim() == null || os.getReservsId().trim().length() > 0){ 
-                        os.setStatusService(StatusService.EMBARGADO);
-                    }else{ 
-                        os.setExpenditureType(ExpenditureType.INVESTIMENTO);                    
-                        os.setStatusService(StatusService.REGISTRADO);
-                        updateOrderService(os, (x, y) -> {}); 
-                    }
-                    osDao.updateSapCheck(os);
-                    System.out.println("Projeto: " + os.getR() + "->" + os.getReservsId());
-                }               
+                }
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(parentView, e.getMessage());
+                notify();
+            } catch (DbException e) {
+                JOptionPane.showMessageDialog(parentView, e.getMessage());
+                notify();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(parentView, e.getMessage());
+                notify();
+            } catch (ParseException e) {
+                JOptionPane.showMessageDialog(parentView, e.getMessage());
+                notify();
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(parentView, e.getMessage());
+                notify();
             }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (DbException e) {
-            System.out.println(e.getMessage());
-        } catch (NullPointerException e) {
-            e.printStackTrace();           
-        }catch(ParseException e){
-            System.out.println(e.getMessage());            
-        }catch (NumberFormatException e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
+            progressInfoView.dispose();    
     }
 
     private void updateOrderService(OrderService os, CustomConsumer<OrderService, String[]> con) throws ParseException {
@@ -129,11 +144,12 @@ public class ImportSAPServicesData2 extends Thread {
         for (String resId : res) {
             List<BudgetMaterial> materials = new ArrayList<>();
             Reserv currentReserv = os.getReservById(resId);
-            if(currentReserv.getService() == null)
+            if (currentReserv.getService() == null) {
                 currentReserv.setService(os);
+            }
             for (String line : lines) { //////////
                 fields = line.split(";");
-                
+
                 if (resId.trim().equals(fields[3].trim())) {
                     con.accept(os, fields);
                     String budgetQuantity = fields[12].trim().replace(",", ".");
@@ -152,14 +168,16 @@ public class ImportSAPServicesData2 extends Thread {
                     if (currentReserv.getReservType() == null) {
                         currentReserv.setReservType(ReservType.valueOf("T" + fields[5].trim()));
                     }
-                    if(os.getCity() == null || os.getCity().trim().length() == 0 && fields[2].trim().length() > 0)
-                        os.setCity(fields[2].trim());                   
-                    if(fields[1].trim().contains("MULT") || fields[1].trim().contains("DV CKT"))
-                        os.setServiceType(ServiceType.PLANO_DE_MELHORIAS);
-                    if(fields[1].trim().length() > 0){
+                    if (os.getCity() == null || os.getCity().trim().length() == 0 && fields[2].trim().length() > 0) {
+                        os.setCity(fields[2].trim());
+                    }
+                    if (fields[1].trim().contains("MULT") || fields[1].trim().contains("DV CKT")) {
+                        os.setServiceType(ServiceType.MELHORIA);
+                    }
+                    if (fields[1].trim().length() > 0) {
                         String descript = os.getDescription();
                         os.setDescription(fields[1].trim() + "\n\n" + descript);
-                    }                    
+                    }
                     materials.add(bm);
                 }
             }

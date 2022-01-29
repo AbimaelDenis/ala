@@ -14,10 +14,10 @@ import javax.swing.text.PlainDocument;
  *
  * @author Abimael
  */
-public class SpecialCharConstraint extends PlainDocument{
+public class UpperCaseConstraint extends PlainDocument{
     private int maxLength = 0;
    
-    public SpecialCharConstraint(int maxLength){
+    public UpperCaseConstraint(int maxLength){
         this.maxLength = maxLength;
     }
              
@@ -27,9 +27,9 @@ public class SpecialCharConstraint extends PlainDocument{
         String oldValue = getText(0, getLength());
         int newLength = oldValue.length() + str.length(); 
         if(newLength <= maxLength){        
-            if(str.matches("[A-Za-z0-9]")){
+//            if(str.matches("[A-Za-z0-9]"))
                 super.insertString(offs, str.toUpperCase(), attr);
-            }
+            
         }      
     }
     

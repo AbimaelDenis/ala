@@ -6,7 +6,9 @@
 package com.mycompany.ala.dao;
 
 import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.entities.Reserv;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -17,4 +19,6 @@ public interface OrderServiceDao {
     boolean containsOrderService(String id);
     List<OrderService> findAllOpenServices();  
     void updateSapCheck(OrderService os);
+    Set<Reserv> findReservByServiceId(String id);
+    void deleteReservByServiceId(String id);
 }

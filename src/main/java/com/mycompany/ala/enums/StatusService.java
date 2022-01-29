@@ -17,7 +17,6 @@ public enum StatusService {
     CONCLUIDO,
     ATUALIZADO,
     PROTOCOLADO,
-    ENCERRADO,
-    EMBARGADO,
+    ENCERRADO,   
     CANCELADO;
 }

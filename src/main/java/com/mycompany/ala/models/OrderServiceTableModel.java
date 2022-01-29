@@ -80,11 +80,14 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
         }
     }
     
-    public void loadServicesList(){ 
+    public void updateServicesList(){ 
         services = DaoFactory.createOrderServiceDao().findAllOpenServices();
         this.fireTableDataChanged();
     }
     
+    public OrderService getOrderService(int index){
+        return services.get(index);
+    }
     
 
    

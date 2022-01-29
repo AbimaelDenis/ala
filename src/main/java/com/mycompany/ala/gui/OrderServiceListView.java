@@ -5,24 +5,19 @@
  */
 package com.mycompany.ala.gui;
 
+import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.enums.OrderServiceFormType;
-import com.mycompany.ala.exceptions.ServiceException;
 import com.mycompany.ala.models.OrderServiceTableModel;
-import com.mycompany.ala.services.ImportSAPServicesData;
 import com.mycompany.ala.services.ImportSAPServicesData2;
 import com.mycompany.ala.services.ImportServicesFromFile;
 import com.mycompany.ala.util.DefaultFileChooser;
-import java.awt.Component;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.function.Consumer;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
 import javax.swing.ListSelectionModel;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -31,11 +26,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class OrderServiceListView extends javax.swing.JFrame {
 
     private OrderServiceTableModel model = new OrderServiceTableModel(this);
-    private int count = 0;
 
     public OrderServiceListView() {
         initComponents();
-        model.loadServicesList();
+        model.updateServicesList();
         tbOrderServices.setModel(model);
         tbOrderServices.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         setLocationRelativeTo(null);
@@ -179,9 +173,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewActionPerformed
-        createOrderServiceFormView(form -> {
-            form.setMode(OrderServiceFormType.NEW);
-        });
+        createOrderServiceFormView(null, OrderServiceFormType.NEW);
     }//GEN-LAST:event_btnNewActionPerformed
 
     private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
@@ -189,9 +181,10 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnFilterActionPerformed
 
     private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
-        createOrderServiceFormView(form -> {
-            form.setMode(OrderServiceFormType.CONSULT_MODE);
-        });
+        if (tbOrderServices.getSelectedRow() != -1)
+            createOrderServiceFormView(this.model.getOrderService(tbOrderServices.getSelectedRow()), OrderServiceFormType.CONSULT_MODE);
+        else
+            JOptionPane.showMessageDialog(this, "Selecione um serviço.");
     }//GEN-LAST:event_btnConsultActionPerformed
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
@@ -203,10 +196,13 @@ public class OrderServiceListView extends javax.swing.JFrame {
         int result = fc.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
-            
-            ImportSAPServicesData2 issd = new ImportSAPServicesData2(this, path);
-            issd.subscribeDataChangeListener(model);
-            issd.start();         
+
+            ImportSAPServicesData2 importSapServicesData = new ImportSAPServicesData2(this, path);
+            importSapServicesData.subscribeDataChangeListener(model);
+            importSapServicesData.start();
+
+            model.updateServicesList();
+
         }
     }//GEN-LAST:event_btnSapActionPerformed
     private void importServicesFromFile() {
@@ -221,13 +217,11 @@ public class OrderServiceListView extends javax.swing.JFrame {
         }
     }
 
-    private void createOrderServiceFormView(Consumer<OrderServiceFormView> con) {
+    private void createOrderServiceFormView(OrderService os, OrderServiceFormType type) {
         JDialog osfv = new JDialog(this, true);
         osfv.setResizable(false);
-        OrderServiceFormView view = new OrderServiceFormView();
-        if (con != null) {
-            con.accept(view);
-        }
+        OrderServiceFormView view = new OrderServiceFormView(os, type);
+
         osfv.setContentPane(view.getContentPane());
 
         osfv.setSize(view.getSize());

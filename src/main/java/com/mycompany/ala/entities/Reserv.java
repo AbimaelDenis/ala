@@ -28,9 +28,10 @@ public final class Reserv {
         this.id = id;
     }
 
-    public Reserv(String id, String receptor, ReservType reservType) {
+    public Reserv(String id, String receptor, Date needDate, ReservType reservType) {
         this.id = id;
         this.receptor = receptor;
+        this.needDate = needDate;
         this.reservType = reservType;
     }
 

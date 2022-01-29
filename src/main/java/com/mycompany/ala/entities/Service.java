@@ -31,6 +31,7 @@ public abstract class Service {
     
     private ServiceType serviceType;
     private StatusService statusService;//
+    private boolean embarg;
     
     private Request request;
     private List<Log> logs = new ArrayList<>();//
@@ -147,9 +148,21 @@ public abstract class Service {
     public void addReserv(Reserv reserv){
         reservs.add(reserv);
     }
+
+    public List<Reserv> getReservs() {
+        return reservs;
+    } 
     
     public void addProg(Prog prog){
         progs.add(prog);
+    }
+
+    public boolean isEmbarg() {
+        return embarg;
+    }
+
+    public void setEmbarg(boolean embarg) {
+        this.embarg = embarg;
     }
 
     @Override

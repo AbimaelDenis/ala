@@ -5,6 +5,7 @@
  */
 package com.mycompany.ala.gui;
 
+import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.enums.OrderServiceFormType;
 import com.mycompany.ala.models.ProgTableModel;
 import com.mycompany.ala.models.RequestTableModel;
@@ -13,10 +14,10 @@ import com.mycompany.ala.util.DoubleConstraint;
 import com.mycompany.ala.util.JSpinnerListener;
 import com.mycompany.ala.util.MaxLengthConstraint;
 import com.mycompany.ala.util.OnlyIntNumberConstraint;
-import com.mycompany.ala.util.SpecialCharConstraint;
+import com.mycompany.ala.util.UpperCaseConstraint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import java.text.SimpleDateFormat;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,26 +32,30 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
 /**
  *
  * @author Abimael
  */
 public class OrderServiceFormView extends javax.swing.JFrame {
+    private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private Map<String, String> invalidFields = new HashMap<>();
-    private OrderServiceFormType osft = null;
+    private OrderService os;
+    private OrderServiceFormType type = null;
     private ProgTableModel progTableModel = new ProgTableModel();
     private RequestTableModel requestTableModel = new RequestTableModel();
     private ReservTableModel reservTableModel = new ReservTableModel();
+
     /**
      * Creates new form OrderServiceFormView
      */
-    public OrderServiceFormView() {     
+    public OrderServiceFormView(OrderService os, OrderServiceFormType type) {
         initComponents();
-        configFields(); 
-        tbProg.setModel(progTableModel);
-        tbMaterialRequest.setModel(requestTableModel);
-        tbReserv.setModel(reservTableModel);
+        configTables();
+        configFields();
+        this.os = os;
+        this.type = type;
+        setMode(type);
+        fillFields(os);
     }
 
     /**
@@ -227,7 +232,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         });
 
-        comboBoxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "ESTRUTURAL", "MELHORIA", "NDS", "PODA", "TERMOGRÁFICA" }));
+        comboBoxType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "DEFEITO", "ENCAIXE", "ESTRUTURAL", "MELHORIA", "NDS", "PODA", "TERMOGRÁFICA", "RECLAMAÇÃO_DE_TENSÃO" }));
         comboBoxType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxTypeActionPerformed(evt);
@@ -580,16 +585,15 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     .addComponent(jScrollPane2)
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabel20)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(jLabel20)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -601,9 +605,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -611,8 +613,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -656,9 +658,10 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     }//GEN-LAST:event_comboBoxTypeActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        if(osft != OrderServiceFormType.NEW){
-            setMode(OrderServiceFormType.EDIT_MODE);
-        }else{
+        if (type != OrderServiceFormType.NEW) {
+            setMode(OrderServiceFormType.EDIT_MODE);     
+            fillFields(os);         
+        } else {
             validateFields();
         }
     }//GEN-LAST:event_btnEditActionPerformed
@@ -670,13 +673,13 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private void txtReservActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtReservActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtReservActionPerformed
-    
-    public void setMode(OrderServiceFormType osft){
-        this.osft = osft;
-        switch(osft){
+
+    public void setMode(OrderServiceFormType type) {
+        switch (type) {
             case CONSULT_MODE:
                 txtId.setEditable(false);
                 enabledComponents(false);
+                cbCreateDate.setEnabled(false);
                 break;
             case EDIT_MODE:
                 txtId.setEditable(false);
@@ -693,19 +696,19 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 btnProgEdit.setEnabled(false);
                 btnLog.setEnabled(false);
                 lblRegisterDate.setText("");
-                break;              
+                break;
             case EMBARG_MODE:
                 txtId.setEditable(false);
                 enabledComponents(false);
                 btnMaterialRequest.setEnabled(false);
                 btnNewProg.setEnabled(false);
                 btnProgEdit.setEnabled(false);
-                break;           
-            default:               
+                break;
+            default:
         }
     }
-    
-    private void enabledComponents(boolean enabled){
+
+    private void enabledComponents(boolean enabled) {
         txtLote.setEditable(enabled);
         txtR.setEditable(enabled);
         txtReserv.setEnabled(enabled);
@@ -722,6 +725,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         comboBoxStatus.setEnabled(enabled);
         taDescript.setEditable(enabled);
     }
+
     /**
      * @param args the command line arguments
      */
@@ -752,7 +756,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new OrderServiceFormView().setVisible(true);
+                new OrderServiceFormView(null, OrderServiceFormType.NEW).setVisible(true);
             }
         });
     }
@@ -814,84 +818,129 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JTextField txtReserv;
     // End of variables declaration//GEN-END:variables
 
+    private void fillFields(OrderService os) {
+        if (os != null) {
+            lblRegisterDate.setText(sdf.format(os.getRegisterDate()));
+            txtId.setText(os.getId());
+            
+            if (os.getLote() != null && os.getLote().trim().length() > 0 && os.getLote().trim().matches("[+-]?\\d*(\\.\\d+)?"))                
+                txtLote.setText(String.valueOf(Integer.parseInt(os.getLote().trim())));
+            if (os.getR() != null && os.getR().trim().matches("[+-]?\\d*(\\.\\d+)?"))        
+                txtR.setText(os.getR());
+            if(os.getCreateDate() != null)
+                spinnerCreateDate.setValue(os.getCreateDate());
+            if(os.getFiscal() != null)
+                txtFiscal.setText(os.getFiscal());
+            if(os.getAlim() != null)
+                txtAlim.setText(os.getAlim());
+            if(os.getTechnicalObject() != null)
+                txtObjTec.setText(os.getTechnicalObject());
+            if(os.getLocal() != null)
+                txtLocal.setText(os.getLocal());
+            if(os.getUnlockKm() != null)
+                txtKm.setText(String.valueOf(os.getUnlockKm()));
+            if(os.getServiceType() != null)
+                comboBoxType.setSelectedItem(String.valueOf(os.getServiceType()));     
+            if(os.getExpenditureType() != null)
+                comboBoxExpenditure.setSelectedItem(String.valueOf(os.getExpenditureType()));
+//            comboBoxStatus.setSelectedItem("REGISTRADO");
+//            
+            if(os.getConclusionDate() != null)
+                spinnerConclusion.setValue(os.getConclusionDate());
+            if(os.getCloseDate() != null)
+                spinnerClose.setValue(os.getCloseDate());
+            if(os.getDescription() != null && os.getDescription().trim().length() > 0)
+                taDescript.setText(os.getDescription());
+        }
+    }
+
     private boolean validateFields() {
         System.out.println("validatefields()");
 
-            String id = txtId.getText();
-            String Lote = txtLote.getText();
-            String R = txtR.getText();
-            String createDate = "";
-            
-            if(cbCreateDate.isSelected()){
-                createDate = spinnerCreateDate.getValue().toString();
-            }
-            
-            String fiscal = txtFiscal.getText();
-            String alim = txtAlim.getText();
-            String objTec = txtObjTec.getText();
-            String local = txtLocal.getText();
-            String km = txtKm.getText();
-            
-            String type = comboBoxType.getSelectedItem().toString();
-            String expenditureType = comboBoxExpenditure.getSelectedItem().toString();
-            String status = comboBoxStatus.getSelectedItem().toString();
-     
+        String id = txtId.getText();
+        String Lote = txtLote.getText();
+        String R = txtR.getText();
+        String createDate = "";
+
+        if (cbCreateDate.isSelected()) {
+            createDate = spinnerCreateDate.getValue().toString();
+        }
+
+        String fiscal = txtFiscal.getText();
+        String alim = txtAlim.getText();
+        String objTec = txtObjTec.getText();
+        String local = txtLocal.getText();
+        String km = txtKm.getText();
+
+        String type = comboBoxType.getSelectedItem().toString();
+        String expenditureType = comboBoxExpenditure.getSelectedItem().toString();
+        String status = comboBoxStatus.getSelectedItem().toString();
+
         return true;
     }
 
     private void configFields() {
+
         tbProg.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbMaterialRequest.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbReserv.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
-        txtId.setDocument(new MaxLengthConstraint(15));      
+
+        txtId.setDocument(new MaxLengthConstraint(15));
         txtLote.setDocument(new OnlyIntNumberConstraint(7));
-        txtR.setDocument(new OnlyIntNumberConstraint(6)); 
+        txtR.setDocument(new OnlyIntNumberConstraint(6));
         txtReserv.setDocument(new OnlyIntNumberConstraint(9));
-        txtFiscal.setDocument(new MaxLengthConstraint(40));            
-        txtAlim.setDocument(new MaxLengthConstraint(9));     
-        txtObjTec.setDocument(new SpecialCharConstraint(8));      
-        txtLocal.setDocument(new SpecialCharConstraint(8));  
+        txtFiscal.setDocument(new MaxLengthConstraint(40));
+        txtAlim.setDocument(new MaxLengthConstraint(9));
+        txtObjTec.setDocument(new UpperCaseConstraint(8));
+        txtLocal.setDocument(new UpperCaseConstraint(8));
         txtKm.setDocument(new DoubleConstraint(8));
-        
+
         //spinnerCreateDate
-        JTextField txtCreateDate = ((JSpinner.DateEditor) spinnerCreateDate.getEditor()).getTextField();      
+        JTextField txtCreateDate = ((JSpinner.DateEditor) spinnerCreateDate.getEditor()).getTextField();
         JSpinnerListener.setFixedLength(txtCreateDate, txtCreateDate.getText().length());
         JSpinnerListener.setDateChangeListener(spinnerCreateDate);
-        
+
         //spinnerConclusion
         JTextField txtConclusion = ((JSpinner.DateEditor) spinnerConclusion.getEditor()).getTextField();
         JSpinnerListener.setFixedLength(txtConclusion, txtConclusion.getText().length());
         JSpinnerListener.setDateChangeListener(spinnerConclusion);
-        
+
         //spinnerClose
         JTextField txtClose = ((JSpinner.DateEditor) spinnerClose.getEditor()).getTextField();
         JSpinnerListener.setFixedLength(txtClose, txtClose.getText().length());
         JSpinnerListener.setDateChangeListener(spinnerClose);
-        
-        cbCreateDate.addChangeListener(new ChangeListener(){
+
+        cbCreateDate.addChangeListener(new ChangeListener() {
             @Override
-            public void stateChanged(ChangeEvent e){
-                if(cbCreateDate.isSelected())
+            public void stateChanged(ChangeEvent e) {
+                if (cbCreateDate.isSelected()) {
                     spinnerCreateDate.setEnabled(true);
-                else
+                } else {
                     spinnerCreateDate.setEnabled(false);
-            }     
-        });
-            
-        comboBoxStatus.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e){
-               if(comboBoxStatus.getSelectedItem().toString().equals("CONCLUIDO")){
-                   spinnerConclusion.setEnabled(true);
-                   spinnerClose.setEnabled(false);
-               }else if(comboBoxStatus.getSelectedItem().toString().equals("ENCERRADO")){
-                   spinnerClose.setEnabled(true);
-                   spinnerConclusion.setEnabled(false);
-               }else{
-                   spinnerConclusion.setEnabled(false);
-                   spinnerClose.setEnabled(false);
-               }
+                }
             }
-        });                           
+        });
+
+        comboBoxStatus.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (comboBoxStatus.getSelectedItem().toString().equals("CONCLUIDO")) {
+                    spinnerConclusion.setEnabled(true);
+                    spinnerClose.setEnabled(false);
+                } else if (comboBoxStatus.getSelectedItem().toString().equals("ENCERRADO")) {
+                    spinnerClose.setEnabled(true);
+                    spinnerConclusion.setEnabled(false);
+                } else {
+                    spinnerConclusion.setEnabled(false);
+                    spinnerClose.setEnabled(false);
+                }
+            }
+        });
+    }
+
+    private void configTables() {      
+        tbProg.setModel(progTableModel);
+        tbMaterialRequest.setModel(requestTableModel);
+        tbReserv.setModel(reservTableModel);
+
     }
 }

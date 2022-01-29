@@ -86,6 +86,11 @@ public class ProgressInfoView extends javax.swing.JFrame {
         lblInfo.setText(info);
     }
     
+    public void setInderterminate(boolean inderteminate){
+        lblProgress.setVisible(!inderteminate);
+        pbProgress.setIndeterminate(inderteminate);
+    }
+    
     /**
      * @param args the command line arguments
      */

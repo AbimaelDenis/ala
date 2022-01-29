@@ -10,12 +10,12 @@ package com.mycompany.ala.enums;
  * @author Abimael
  */
 public enum ServiceType {
-    CORREÇÃO_DE_DEFEITO,  
+    DEFEITO,
+    ENCAIXE,
     ESTRUTURAL,
-    TERMOGRÁFICA,
+    MELHORIA,
     NDS,
-    OBRAS_DE_ENCAIXE,
-    PLANO_DE_MELHORIAS,
     PODA,
-    RECLAMAÇÃO_DE_TENSÃO;   
+    RECLAMAÇÃO_DE_TENSÃO,
+    TERMOGRÁFICA;          
 }
