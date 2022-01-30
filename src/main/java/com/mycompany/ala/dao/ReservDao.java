@@ -6,12 +6,14 @@
 package com.mycompany.ala.dao;
 
 import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.entities.Reserv;
 
 /**
  *
  * @author Abimael
  */
 public interface ReservDao {
+    void insertReserv(Reserv reserv);
     void findReservById(OrderService os);
     void deleteReservById(String id);
 }

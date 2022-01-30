@@ -5,18 +5,13 @@
  */
 package com.mycompany.ala.models;
 
-import com.mycompany.ala.dao.DaoFactory;
-import com.mycompany.ala.entities.Material;
-import com.mycompany.ala.entities.OrderService;
-import com.mycompany.ala.entities.Prog;
-import com.mycompany.ala.entities.Request;
-import com.mycompany.ala.entities.RequestMaterial;
 
+import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.entities.RequestMaterial;
 import com.mycompany.ala.services.DataChangeListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JFrame;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -28,7 +23,7 @@ public class RequestTableModel extends AbstractTableModel implements DataChangeL
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     private static List<RequestMaterial> requestMaterials = new ArrayList<>();
     
-    private String[] columns = {"Código", "Descrição", "Q. Requisitado"};
+    private String[] columns = {"Código", "Descrição", "Requisitado"};
     
     public RequestTableModel(){
        

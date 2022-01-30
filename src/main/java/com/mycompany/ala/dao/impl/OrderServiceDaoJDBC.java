@@ -5,13 +5,14 @@
  */
 package com.mycompany.ala.dao.impl;
 
+import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.dao.OrderServiceDao;
+import com.mycompany.ala.dao.ReservDao;
 import com.mycompany.ala.db.DB;
 import com.mycompany.ala.entities.BudgetMaterial;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
 import com.mycompany.ala.enums.ExpenditureType;
-import com.mycompany.ala.enums.ReservType;
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
@@ -22,9 +23,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 /**
  *
@@ -33,6 +33,7 @@ import java.util.Set;
 public class OrderServiceDaoJDBC implements OrderServiceDao {
 
     private static Connection conn = null;
+    private ReservDao reservDao = DaoFactory.createReservDao();
 
     public OrderServiceDaoJDBC(Connection conn) {
         this.conn = conn;
@@ -65,7 +66,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
     @Override
     public void insertOrderService(OrderService os) {
         PreparedStatement st = null;
-        
+
         try {
             st = conn.prepareStatement("INSERT INTO orderservice (Id, Lote, Alimentador, Base, "
                     + "Tipo, ObjetoTecnico, Localizacao, Km, R, Reserva, Descricao, "
@@ -184,8 +185,8 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         }
         os.setEmbarg(embarg);
 
-        findReservById(os);
-
+        reservDao.findReservById(os);
+        
         return os;
     }
 
@@ -211,41 +212,13 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             st.executeUpdate();
 
             String[] reserv = os.getReservsId().split(" ");
-            for (String r : reserv) {
-                if (reserv.length > 0 && reserv != null) {
-                    conn.setAutoCommit(false);
-                    deleteReservById(r);
-                    List<BudgetMaterial> materials = os.getReservById(r).getBudgetMaterials();
-                    for (BudgetMaterial bm : materials) {
-                        st = conn.prepareStatement("INSERT INTO budgetmaterial (Reserva, Codigo, Descricao, Unidade, "
-                                + "Orcado, Atendido, DataNecessidade, Recebedor, Tipo) "
-                                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-                        st.setString(1, bm.getReserv().getId());
-                        st.setString(2, bm.getCode());
-                        st.setString(3, bm.getDescription());
-                        st.setString(4, bm.getUnits());
-                        st.setDouble(5, bm.getBudgetQuantity());
-                        st.setDouble(6, bm.getDispatchedQauntity());
-                        st.setDate(7, new java.sql.Date(bm.getReserv().getNeedDate().getTime()));
-                        st.setString(8, bm.getReserv().getReceptor());
-                        st.setString(9, String.valueOf(bm.getReserv().getReservType()));
-                        //st.setString(10, bm.getReserv().getService().getId());
-
-                        st.executeUpdate();
-                    }
+            if (reserv.length > 0 && reserv != null) {
+                for (String r : reserv) {
+                    reservDao.insertReserv(os.getReservById(r.trim()));
                 }
-                conn.commit();
-            }
-
-            int rowsAffected = st.executeUpdate();
+            }           
         } catch (SQLException e) {
-            try {
-                conn.rollback();
-                throw new DbException("Transaction rolled back. Error in updateSapCheck(): " + e.getMessage());
-            } catch (SQLException e1) {
-                throw new DbException("Error trying to rollback. Error in updateSapCheck(): " + e.getMessage());
-            }
+            throw new DbException("Transaction rolled back. Error in updateSapCheck(): " + e.getMessage());
         } finally {
             DB.closeStatement(st);
         }
@@ -253,59 +226,11 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
 
     @Override
     public void findReservById(OrderService os) {
-        List<Reserv> reservs = new ArrayList<>();
-        List<BudgetMaterial> budgetMaterials = new ArrayList<>();
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        for (Reserv reserv : os.getReservs()) {
-            try {
-                st = conn.prepareStatement("SELECT*FROM budgetmaterial WHERE Reserva = ?");
 
-                st.setString(1, reserv.getId().trim());
-
-                rs = st.executeQuery();
-
-                while (rs.next()) {
-                    String reservId = rs.getString("Reserva");
-                    String code = rs.getString("Codigo");
-                    String descrip = rs.getString("Descricao");
-                    String unit = rs.getString("Unidade");
-                    Double budgetQuantity = rs.getDouble("Orcado");
-                    Double dispatchedQuantity = rs.getDouble("Atendido");
-                    Date needDate = rs.getDate("DataNecessidade");
-                    String receptor = rs.getString("Recebedor");
-                    ReservType type = ReservType.valueOf(rs.getString("Tipo"));
-                  
-                    reserv.setReceptor(receptor);
-                    reserv.setNeedDate(needDate);
-                    reserv.setReservType(type);
-                    BudgetMaterial bm = new BudgetMaterial(code, descrip, unit, budgetQuantity, reserv);
-                    bm.setDispatchedQauntity(dispatchedQuantity);
-                    budgetMaterials.add(bm);
-                }
-
-                reserv.setBudgetMaterials(budgetMaterials);
-                
-            } catch (SQLException e) {
-                throw new DbException("Error in findReservByServiceId(): " + e.getMessage());
-            } finally {
-                DB.closeStatement(st);
-                DB.closeResultSet(rs);
-            }
-        }
     }
 
     @Override
     public void deleteReservById(String id) {
-        PreparedStatement st = null;
 
-        try {
-            st = conn.prepareStatement("DELETE FROM budgetMaterial WHERE Reserva = ?");
-
-            st.setString(1, id);
-            st.executeUpdate();
-        } catch (SQLException e) {
-            throw new DbException("Error in deleteReservByServiceId(): " + e.getMessage());
-        }
     }
 }

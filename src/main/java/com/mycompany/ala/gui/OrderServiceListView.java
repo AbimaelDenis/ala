@@ -25,7 +25,7 @@ import javax.swing.ListSelectionModel;
  */
 public class OrderServiceListView extends javax.swing.JFrame {
 
-    private OrderServiceTableModel model = new OrderServiceTableModel(this);
+    private OrderServiceTableModel model = new OrderServiceTableModel();
 
     public OrderServiceListView() {
         initComponents();
@@ -150,7 +150,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 680, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 957, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -165,7 +165,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
                     .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -200,8 +200,6 @@ public class OrderServiceListView extends javax.swing.JFrame {
             ImportSAPServicesData importSapServicesData = new ImportSAPServicesData(this, path);
             importSapServicesData.subscribeDataChangeListener(model);
             importSapServicesData.start();
-
-            //model.onDataChange(null);
 
         }
     }//GEN-LAST:event_btnSapActionPerformed
