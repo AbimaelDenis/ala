@@ -5,7 +5,6 @@
  */
 package com.mycompany.ala.util;
 
-import java.util.function.Consumer;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -14,22 +13,26 @@ import javax.swing.text.PlainDocument;
  *
  * @author Abimael
  */
-public class UpperCaseConstraint extends PlainDocument {
-
+public class OnlyAlphCharConstraint extends PlainDocument{
     private int maxLength = 0;
-
-    public UpperCaseConstraint(int maxLength) {
+    
+    public OnlyAlphCharConstraint(int maxLength){ 
         this.maxLength = maxLength;
     }
-
+             
     @Override
     public void insertString(int offs, String str, AttributeSet attr) throws BadLocationException {
 
+        if (str == null) return;  
+              
         String oldValue = getText(0, getLength());
-        int newLength = oldValue.length() + str.length();
-        if (newLength <= maxLength) {
-            super.insertString(offs, str.replaceAll("[^A-Za-z0-9-/\\s]", "").toUpperCase(), attr);
-        }
+        int newLength = oldValue.length() + str.length(); 
+        if(newLength <= maxLength){
+            if(str.matches("[A-Za-zÁÉÍÓÚáéíóú-]|\\s")){
+                super.insertString(offs, str, attr);
+            }
+        }  
+                       
     }
-
+    
 }

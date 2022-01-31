@@ -48,8 +48,8 @@ public class ReservTableModel extends AbstractTableModel implements DataChangeLi
 
     @Override
     public void onDataChange(Object obj) {
-        if (obj instanceof OrderService) {
-            //progs.add((OrderService) obj);                      
+        if (obj instanceof Reserv) {
+            reservs.add((Reserv) obj);                      
             this.fireTableDataChanged();
         }
     }

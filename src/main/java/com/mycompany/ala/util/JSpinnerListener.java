@@ -37,7 +37,6 @@ public class JSpinnerListener {
         return createChangeListener(spn, (spinner) -> {
             if (((Date) spinner.getValue()).getTime() > new Date().getTime()) {
                 spinner.setValue(new Date());
-                System.out.println("true");
             } 
         });
     }
