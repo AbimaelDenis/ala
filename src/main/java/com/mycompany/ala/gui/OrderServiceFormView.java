@@ -5,11 +5,15 @@
  */
 package com.mycompany.ala.gui;
 
+import com.mycompany.ala.dao.DaoFactory;
+import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
 import com.mycompany.ala.enums.ExpenditureType;
 
 import com.mycompany.ala.enums.OrderServiceFormType;
+import com.mycompany.ala.enums.ServiceType;
+import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.models.ProgTableModel;
 import com.mycompany.ala.models.RequestTableModel;
 import com.mycompany.ala.models.ReservTableModel;
@@ -20,9 +24,12 @@ import com.mycompany.ala.util.MaxLengthConstraint;
 import com.mycompany.ala.util.OnlyAlphCharConstraint;
 import com.mycompany.ala.util.OnlyIntNumberConstraint;
 import com.mycompany.ala.util.UpperCaseConstraint;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
@@ -52,12 +59,13 @@ import javax.swing.event.ChangeListener;
 public class OrderServiceFormView extends javax.swing.JFrame {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-    private Map<String, String> invalidFields = new HashMap<>();
+    private DataChangeListener listener;
     private OrderService os;
     private OrderServiceFormType type = null;
     private ProgTableModel progTableModel = new ProgTableModel();
     private RequestTableModel requestTableModel = new RequestTableModel();
     private ReservTableModel reservTableModel = new ReservTableModel();
+    private OrderServiceDao osDao = DaoFactory.createOrderServiceDao();
 
     /**
      * Creates new form OrderServiceFormView
@@ -77,6 +85,10 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         }
         fillFields(os);
+    }
+    
+    public void subscribeChangeListener(DataChangeListener listener){
+        this.listener = listener;
     }
 
     /**
@@ -143,6 +155,9 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         lblKmError = new javax.swing.JLabel();
         lblTypeError = new javax.swing.JLabel();
         lblExpenditureError = new javax.swing.JLabel();
+        txtBase = new javax.swing.JTextField();
+        jLabel25 = new javax.swing.JLabel();
+        lblBaseError = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tbReserv = new javax.swing.JTable();
@@ -158,6 +173,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jLabel20 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         taDescript = new javax.swing.JTextArea();
+        lblDescriptError = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -397,66 +413,78 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         lblExpenditureError.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         lblExpenditureError.setForeground(new java.awt.Color(255, 0, 0));
 
+        txtBase.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBaseActionPerformed(evt);
+            }
+        });
+
+        jLabel25.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel25.setForeground(new java.awt.Color(100, 100, 100));
+        jLabel25.setText("Base");
+
+        lblBaseError.setName("lblBaseError");
+        lblBaseError.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        lblBaseError.setForeground(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
+                        .addComponent(btnLog)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEdit))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnLog)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnEdit))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel6))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblCloseDate, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblRegisterDate))
-                                .addGap(48, 48, 48)
-                                .addComponent(lblEmbarg, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel18)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(cbCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel10)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel1))
-                                .addGap(7, 7, 7)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtLote, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
-                                    .addComponent(txtR)
-                                    .addComponent(txtId))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblIdError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblRError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblLoteError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addComponent(jLabel11)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAddReserv)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblReservError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel18)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(cbCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jLabel10)
+                                            .addComponent(jLabel4)
+                                            .addComponent(jLabel1))
+                                        .addGap(7, 7, 7)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(txtLote)
+                                            .addComponent(txtR)
+                                            .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblIdError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(lblRError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(lblLoteError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGap(14, 14, 14)
+                                        .addComponent(jLabel11)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnAddReserv)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lblReservError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel7)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblCloseDate, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jLabel6)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(lblRegisterDate)))
+                                        .addGap(51, 51, 51)
+                                        .addComponent(lblEmbarg, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -468,7 +496,9 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                                             .addComponent(jLabel9))
                                         .addGap(7, 7, 7))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                        .addComponent(jLabel24)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jLabel25)
+                                            .addComponent(jLabel24))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(txtLocal, javax.swing.GroupLayout.Alignment.LEADING)
@@ -476,7 +506,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                                     .addComponent(txtAlim, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtFiscal, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtKm, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCity, javax.swing.GroupLayout.Alignment.LEADING))
+                                    .addComponent(txtCity, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtBase))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblCityError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -484,7 +515,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                                     .addComponent(lblAlimError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblObjTecError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblLocalError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblKmError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(lblKmError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblBaseError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -505,7 +537,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(lblTypeError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblExpenditureError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))))))))
+                                            .addComponent(lblExpenditureError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                        .addGap(0, 50, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -517,11 +550,11 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel6)
                         .addComponent(lblRegisterDate)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(lblCloseDate))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -531,15 +564,17 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                             .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(lblIdError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(txtLote, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblLoteError, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblLoteError, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4)
+                        .addComponent(txtLote, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(txtR, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblRError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblRError, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel10)
+                        .addComponent(txtR, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -551,61 +586,69 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     .addComponent(jLabel18)
                     .addComponent(spinnerCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbCreateDate, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtCity, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel24)
-                    .addComponent(lblCityError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(4, 4, 4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel21)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblFiscalError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtAlim, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblAlimError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtObjTec, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8)
-                    .addComponent(lblObjTecError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtLocal, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
-                    .addComponent(lblLocalError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(txtKm, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblKmError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboBoxType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15)
-                    .addComponent(lblTypeError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(comboBoxExpenditure, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel16))
-                    .addComponent(lblExpenditureError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(comboBoxStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel22))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(spinnerConclusion, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel17))
-                .addGap(26, 26, 26)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnLog, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtBase, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel25))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtCity, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel24)
+                            .addComponent(lblCityError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel21)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblFiscalError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(txtAlim, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblAlimError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtObjTec, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8)
+                            .addComponent(lblObjTecError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtLocal, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9)
+                            .addComponent(lblLocalError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(txtKm, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblKmError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTypeError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(comboBoxType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel15)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(comboBoxExpenditure, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel16))
+                            .addComponent(lblExpenditureError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(comboBoxStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel22))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(spinnerConclusion, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel17))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnLog, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                    .addComponent(lblBaseError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -663,23 +706,27 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addComponent(btnRemoveReserv)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnMaterialRequest))
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnProgEdit)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+                        .addContainerGap()
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)))
                 .addContainerGap())
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnProgEdit)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -691,9 +738,9 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnMaterialRequest, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnMaterialRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -711,6 +758,10 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         taDescript.setRows(5);
         jScrollPane2.setViewportView(taDescript);
 
+        lblExpenditureError.setName("lblExpenditureError");
+        lblDescriptError.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        lblDescriptError.setForeground(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -723,15 +774,19 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                         .addContainerGap())
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addComponent(jLabel20)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblDescriptError, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel20)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel20)
+                    .addComponent(lblDescriptError, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -740,88 +795,24 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtIdActionPerformed
-
-    private void txtLoteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoteActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtLoteActionPerformed
-
-    private void txtRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtRActionPerformed
-
-    private void txtObjTecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtObjTecActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtObjTecActionPerformed
-
-    private void txtLocalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLocalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtLocalActionPerformed
-
-    private void txtKmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtKmActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtKmActionPerformed
-
-    private void txtFiscalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFiscalActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtFiscalActionPerformed
-
-    private void txtAlimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAlimActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtAlimActionPerformed
-
-    private void comboBoxTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxTypeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_comboBoxTypeActionPerformed
-
-    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        if (type == OrderServiceFormType.CONSULT_MODE || type == OrderServiceFormType.EMBARG_MODE) {
-            setMode(OrderServiceFormType.EDIT_MODE);
-            //fillFields(os);
-        } else if (validateFields()) {
-            if (type == OrderServiceFormType.EDIT_MODE) {
-                if (os.isEmbarg()) {
-                    setMode(OrderServiceFormType.EMBARG_MODE);
-                } else {
-                    setMode(OrderServiceFormType.CONSULT_MODE);
-                }
-            } else if (type == OrderServiceFormType.NEW) {
-                setMode(OrderServiceFormType.CONSULT_MODE);
-                JOptionPane.showMessageDialog(this, "Done!");
-            }
-        }
-
-    }//GEN-LAST:event_btnEditActionPerformed
-
-    private void cbCreateDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCreateDateActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbCreateDateActionPerformed
-
-    private void txtReservActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtReservActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtReservActionPerformed
 
     private void txtCityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCityActionPerformed
         // TODO add your handling code here:
@@ -839,6 +830,72 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAddReservActionPerformed
 
+    private void txtReservActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtReservActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtReservActionPerformed
+
+    private void cbCreateDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCreateDateActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbCreateDateActionPerformed
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        if (type == OrderServiceFormType.CONSULT_MODE || type == OrderServiceFormType.EMBARG_MODE) {
+            setMode(OrderServiceFormType.EDIT_MODE);
+            //fillFields(os);
+        } else if (validateFields()) {
+            if (type == OrderServiceFormType.EDIT_MODE) {
+                if (os.isEmbarg()) {
+                    setMode(OrderServiceFormType.EMBARG_MODE);
+                } else {
+                    setMode(OrderServiceFormType.CONSULT_MODE);
+                }
+            } else if (type == OrderServiceFormType.NEW) {
+                instantiateOrderService();
+
+            }
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
+
+    private void comboBoxTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBoxTypeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboBoxTypeActionPerformed
+
+    private void txtKmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtKmActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtKmActionPerformed
+
+    private void txtLocalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLocalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLocalActionPerformed
+
+    private void txtObjTecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtObjTecActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtObjTecActionPerformed
+
+    private void txtAlimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtAlimActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAlimActionPerformed
+
+    private void txtFiscalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFiscalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtFiscalActionPerformed
+
+    private void txtRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRActionPerformed
+
+    private void txtLoteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtLoteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtLoteActionPerformed
+
+    private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdActionPerformed
+
+    private void txtBaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBaseActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBaseActionPerformed
+
     public void setMode(OrderServiceFormType type) {
         this.type = type;
         switch (type) {
@@ -852,6 +909,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                         }
                     }
                 }
+                spinnerCreateDate.setEnabled(false);
                 spinnerConclusion.setEnabled(false);
                 btnNewProg.setEnabled(true);
                 btnProgEdit.setEnabled(true);
@@ -898,7 +956,9 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         txtReserv.setFocusable(enabled);
         btnAddReserv.setEnabled(enabled);
         btnRemoveReserv.setEnabled(enabled);
-        cbCreateDate.setEnabled(enabled);
+        cbCreateDate.setEnabled(enabled);       
+        txtBase.setEditable(enabled);
+        txtBase.setFocusable(enabled);
         txtCity.setEditable(enabled);
         txtCity.setFocusable(enabled);
         txtFiscal.setEditable(enabled);
@@ -977,6 +1037,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -992,8 +1053,10 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblAlimError;
+    private javax.swing.JLabel lblBaseError;
     private javax.swing.JLabel lblCityError;
     private javax.swing.JLabel lblCloseDate;
+    private javax.swing.JLabel lblDescriptError;
     private javax.swing.JLabel lblEmbarg;
     private javax.swing.JLabel lblExpenditureError;
     private javax.swing.JLabel lblFiscalError;
@@ -1013,6 +1076,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private javax.swing.JTable tbProg;
     private javax.swing.JTable tbReserv;
     private javax.swing.JTextField txtAlim;
+    private javax.swing.JTextField txtBase;
     private javax.swing.JTextField txtCity;
     private javax.swing.JTextField txtFiscal;
     private javax.swing.JTextField txtId;
@@ -1045,7 +1109,14 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 txtR.setText(os.getR());
             }
             if (os.getCreateDate() != null) {
+                cbCreateDate.setSelected(true);
+                spinnerCreateDate.setEnabled(true);
                 spinnerCreateDate.setValue(os.getCreateDate());
+                spinnerCreateDate.setEnabled(false);
+                
+            }
+            if (os.getBase() != null && os.getBase().trim().length() > 0) {
+                txtBase.setText(os.getBase());
             }
             if (os.getCity() != null && os.getCity().trim().length() > 0) {
                 txtCity.setText(os.getCity());
@@ -1082,29 +1153,34 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     }
 
     private boolean validateFields() {
-        System.out.println("validatefields()");
+        boolean validId, validR = false, validBase, validCity, validFiscal, validAlim, validObjTec,
+                validLocal, validKm, validType = false, validExpenditure = false, validDescript;
+
+        lblReservError.setText("");
 
         String id = txtId.getText();
 
         if (id.trim().matches("E(MPM|GDT)|OO(ET|AO|SR) ([\\d]{2,5}|[1-9])/20[\\d]{2}")) {
             if ((Integer.parseInt(id.substring(4).trim().split("/")[0]) > 0)) {
                 lblIdError.setText("");
+                validId = true;
             } else {
                 lblIdError.setText("*");
-                return false;
+                validId = false;
             }
         } else {
             lblIdError.setText("*");
-            return false;
+            validId = false;
         }
-        String Lote = txtLote.getText();
+        String lote = txtLote.getText();
         String r = txtR.getText();
         if (r.trim().length() > 0) {
             if (!r.trim().matches("\\d{6,}")) {
                 lblRError.setText("*");
-                return false;
+                validR = false;
             } else {
                 lblRError.setText("");
+                validR = true;
             }
         }
         String createDate = "";
@@ -1116,76 +1192,118 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         }
 
+        String base = txtBase.getText();
+        if (base.trim().length() < 4) {
+            lblBaseError.setText("*");
+            validBase = false;
+        } else {
+            lblBaseError.setText("");
+            validBase = true;
+        }
+
         String city = txtCity.getText();
         if (city.trim().length() < 4) {
             lblCityError.setText("*");
-            return false;
+            validCity = false;
         } else {
             lblCityError.setText("");
+            validCity = true;
         }
 
         String fiscal = txtFiscal.getText();
         if (!fiscal.trim().matches("[A-Za-z0-9]+[.-_]?[A-Za-z0-9]+@\\w+\\.\\w{2,3}(\\.\\w{2})?")) {
             lblFiscalError.setText("*");
-            return false;
+            validFiscal = false;
         } else {
             lblFiscalError.setText("");
+            validFiscal = true;
         }
 
         String alim = txtAlim.getText();
         if (!alim.trim().matches("\\w{3}-0[12]\\w[1-9]")) {
             lblAlimError.setText("*");
-            return false;
+            validAlim = false;
         } else {
             lblAlimError.setText("");
+            validAlim = true;
         }
 
         String objTec = txtObjTec.getText();
-        String local = txtLocal.getText();
-        if (objTec.trim().length() < 5 || local.trim().length() < 5) {
+        if (objTec.trim().length() < 5) {
             lblObjTecError.setText("*");
-            return false;
+            validObjTec = false;
         } else {
             lblObjTecError.setText("");
+            validObjTec = true;
+        }
+
+        String local = txtLocal.getText();
+        if (local.trim().length() < 5) {
+            lblLocalError.setText("*");
+            validLocal = false;
+        } else {
+            lblLocalError.setText("");
+            validLocal = true;
         }
 
         String km = txtKm.getText();
         if (!km.trim().matches("\\d{1,3}(.\\d{1,4})?")) {
             lblKmError.setText("*");
-            return false;
+            validKm = false;
         } else {
             lblKmError.setText("");
+            validKm = true;
         }
 
         String type = comboBoxType.getSelectedItem().toString();
-        if (type.trim().length() == 0) {
+
+        if (type.trim().equals("")) {
             lblTypeError.setText("*");
-            return false;
+            validType = false;
         } else if (type.toUpperCase().trim().equals("MELHORIA") && r.trim().length() < 6) {
             lblRError.setText("*");
             lblTypeError.setText("");
-            return false;
+            validR = false;
+            validType = true;
         } else {
             lblRError.setText("");
+            lblTypeError.setText("");
+            validR = true;
+            validType = true;
         }
 
         String expenditureType = comboBoxExpenditure.getSelectedItem().toString();
         if (expenditureType.trim().toUpperCase().equals("INVESTIMENTO") && r.trim().length() < 6) {
             lblRError.setText("*");
-            return false;
-        } else if (expenditureType.toUpperCase().trim().equals("CUSTEIO") && type.toUpperCase().trim().equals("MELHORIA")) {
-            lblRError.setText("");
-            lblExpenditureError.setText("*");
-            return false;
+            validR = false;
         } else {
-            lblTypeError.setText("");
+            lblRError.setText("");
+            validR = true;
+        }
+
+        if (expenditureType.toUpperCase().trim().equals("CUSTEIO") && type.toUpperCase().trim().equals("MELHORIA")) {
+            lblExpenditureError.setText("*");
+            validExpenditure = false;
+        } else {
+            lblExpenditureError.setText("");
+            validExpenditure = true;
         }
         String status = comboBoxStatus.getSelectedItem().toString();
         if (spinnerConclusion.isEnabled() && status.toUpperCase().trim().equals("CONCLUIDO")) {
             String conclusionDate = sdf.format((Date) spinnerConclusion.getValue());
         }
 
-        return true;
+        if (taDescript.getText().trim().length() == 0) {
+            lblDescriptError.setText("*");
+            validDescript = false;
+        } else {
+            lblDescriptError.setText("");
+            validDescript = true;
+        }
+//        System.out.println(validId + "" + validR + validBase + validCity + validFiscal + validAlim + validObjTec
+//                + validLocal + validKm + validType + validExpenditure + validDescript);   
+        return validId && validR && validBase && validCity && validFiscal && validAlim && validObjTec
+                && validLocal && validKm && validType && validExpenditure && validDescript;
     }
 
     private void configFields() {
@@ -1198,6 +1316,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         txtLote.setDocument(new OnlyIntNumberConstraint(7));
         txtR.setDocument(new OnlyIntNumberConstraint(7));
         txtReserv.setDocument(new OnlyIntNumberConstraint(9));
+        txtBase.setDocument(new OnlyAlphCharConstraint(30));
         txtCity.setDocument(new OnlyAlphCharConstraint(30));
         txtFiscal.setDocument(new MaxLengthConstraint(40));
         txtAlim.setDocument(new UpperCaseConstraint(9));
@@ -1215,6 +1334,31 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         JSpinnerListener.setFixedLength(txtConclusion, txtConclusion.getText().length());
         JSpinnerListener.setDateChangeListener(spinnerConclusion);
 
+        txtId.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (txtId.getText().trim().matches("E(MPM|GDT)|OO(ET|AO|SR) ([\\d]{2,5}|[1-9])/20[\\d]{2}")) {
+                    if (!osDao.containsOrderService(txtId.getText().trim())) {
+                        lblIdError.setForeground(Color.green);
+                        lblIdError.setText("*");
+                    } else {
+                        lblIdError.setForeground(Color.red);
+                        lblIdError.setText("*");
+                    }
+                } else {
+                    lblIdError.setForeground(Color.red);
+                    lblIdError.setText("");
+                }
+            }
+        });
         cbCreateDate.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -1279,6 +1423,42 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             } else {
                 reservTableModel.setReservList(new ArrayList<>());
             }
+        }
+    }
+
+    private void instantiateOrderService() {
+        if (!osDao.containsOrderService(txtId.getText().trim())) {
+            OrderService os = new OrderService(txtId.getText().trim(), txtLote.getText().trim(),
+                    txtAlim.getText().trim(), txtBase.getText().trim().toUpperCase(),
+                    ServiceType.valueOf(comboBoxType.getSelectedItem().toString()),
+                    txtObjTec.getText().trim(), txtLocal.getText().trim(),
+                    taDescript.getText().trim(), new Date());
+            os.setR(txtR.getText().trim());
+            for (Reserv reserv : reservTableModel.getReservList()) {
+                reserv.setService(os);
+                os.addReserv(reserv);
+            }
+            if (cbCreateDate.isSelected()) {
+                os.setCreateDate((Date) spinnerCreateDate.getValue());
+            }
+            os.setCity(txtCity.getText().trim().toUpperCase());
+            os.setFiscal(txtFiscal.getText().trim());
+            os.setUnlockKm(Double.parseDouble(txtKm.getText().trim()));
+            os.setExpenditureType(ExpenditureType.valueOf(comboBoxExpenditure.getSelectedItem().toString()));
+            os.setStatusService(StatusService.valueOf(comboBoxStatus.getSelectedItem().toString()));
+
+            if(osDao.insertOrderService(os) > 0){
+                this.os = os;
+                setMode(OrderServiceFormType.CONSULT_MODE);
+                JOptionPane.showMessageDialog(this, "Registrado!");
+                if(this.listener != null){
+                    this.listener.onDataChange(null);
+                }
+            }else{
+                JOptionPane.showMessageDialog(this, null, "Falha ao registrar serviço.", JOptionPane.ERROR);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Serviço já cadastrado!");
         }
     }
 

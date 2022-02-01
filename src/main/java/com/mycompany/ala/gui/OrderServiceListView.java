@@ -219,7 +219,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
         JDialog osfv = new JDialog(this, true);
         osfv.setResizable(false);
         OrderServiceFormView view = new OrderServiceFormView(os, type);
-
+        view.subscribeChangeListener(this.model);
         osfv.setContentPane(view.getContentPane());
 
         osfv.setSize(view.getSize());

@@ -64,7 +64,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
     }
 
     @Override
-    public void insertOrderService(OrderService os) {
+    public int insertOrderService(OrderService os) {
         PreparedStatement st = null;
 
         try {
@@ -112,7 +112,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
                 st.setDate(18, null);
             }
             st.setBoolean(19, os.isEmbarg());
-            int rowsAffected = st.executeUpdate();
+            return st.executeUpdate();
         } catch (SQLException e) {
             throw new DbException("Error in insertOrderService(): " + e.getMessage());
         } finally {

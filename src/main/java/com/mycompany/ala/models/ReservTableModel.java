@@ -57,6 +57,10 @@ public class ReservTableModel extends AbstractTableModel implements DataChangeLi
     public void setReservList(List<Reserv> reservs) {
         this.reservs = reservs;
     }
+    
+    public List<Reserv> getReservList() {
+        return this.reservs;
+    }
 
     public Reserv getReserv(int index) {
         return reservs.get(index);

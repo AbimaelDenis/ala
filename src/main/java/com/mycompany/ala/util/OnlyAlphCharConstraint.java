@@ -13,26 +13,27 @@ import javax.swing.text.PlainDocument;
  *
  * @author Abimael
  */
-public class OnlyAlphCharConstraint extends PlainDocument{
+public class OnlyAlphCharConstraint extends PlainDocument {
+
     private int maxLength = 0;
-    
-    public OnlyAlphCharConstraint(int maxLength){ 
+
+    public OnlyAlphCharConstraint(int maxLength) {
         this.maxLength = maxLength;
     }
-             
+
     @Override
     public void insertString(int offs, String str, AttributeSet attr) throws BadLocationException {
 
-        if (str == null) return;  
-              
+        if (str == null) {
+            return;
+        }
+
         String oldValue = getText(0, getLength());
-        int newLength = oldValue.length() + str.length(); 
-        if(newLength <= maxLength){
-            if(str.matches("[A-Za-zÁÉÍÓÚáéíóú-]|\\s")){
-                super.insertString(offs, str, attr);
-            }
-        }  
-                       
+        int newLength = oldValue.length() + str.length();
+        if (newLength <= maxLength) {
+            super.insertString(offs, str.replaceAll("[^A-Za-z\\sÁÉÍÓÚáéíóú-]", "").toUpperCase(), attr);
+        }
+
     }
-    
+
 }
