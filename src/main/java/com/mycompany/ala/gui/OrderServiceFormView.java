@@ -17,6 +17,7 @@ import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.models.ProgTableModel;
 import com.mycompany.ala.models.RequestTableModel;
 import com.mycompany.ala.models.ReservTableModel;
+import com.mycompany.ala.services.CompareOrderService;
 import com.mycompany.ala.services.DataChangeListener;
 import com.mycompany.ala.util.DoubleConstraint;
 import com.mycompany.ala.util.JSpinnerListener;
@@ -37,8 +38,6 @@ import java.util.ArrayList;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -61,6 +60,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private DataChangeListener listener;
     private OrderService os;
+    private OrderService orderServiceModified;
     private OrderServiceFormType type = null;
     private ProgTableModel progTableModel = new ProgTableModel();
     private RequestTableModel requestTableModel = new RequestTableModel();
@@ -86,8 +86,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         }
         fillFields(os);
     }
-    
-    public void subscribeChangeListener(DataChangeListener listener){
+
+    public void subscribeChangeListener(DataChangeListener listener) {
         this.listener = listener;
     }
 
@@ -843,15 +843,28 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             setMode(OrderServiceFormType.EDIT_MODE);
             //fillFields(os);
         } else if (validateFields()) {
+            OrderService newOs = instantiateOrderService();
             if (type == OrderServiceFormType.EDIT_MODE) {
+                CompareOrderService cpOs = new CompareOrderService(os, newOs);
+                cpOs.run();
                 if (os.isEmbarg()) {
                     setMode(OrderServiceFormType.EMBARG_MODE);
                 } else {
                     setMode(OrderServiceFormType.CONSULT_MODE);
+                }             
+            } else if (type == OrderServiceFormType.NEW) {             
+                if (newOs != null) {
+                    this.os = newOs;
+                    if (insertOrderService(newOs) > 0) {
+                        setMode(OrderServiceFormType.CONSULT_MODE);
+                        JOptionPane.showMessageDialog(this, "Registrado!");
+                        if (this.listener != null) {
+                            this.listener.onDataChange(null);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, null, "Falha ao registrar serviço.", JOptionPane.ERROR);
+                    }
                 }
-            } else if (type == OrderServiceFormType.NEW) {
-                instantiateOrderService();
-
             }
         }
     }//GEN-LAST:event_btnEditActionPerformed
@@ -956,7 +969,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         txtReserv.setFocusable(enabled);
         btnAddReserv.setEnabled(enabled);
         btnRemoveReserv.setEnabled(enabled);
-        cbCreateDate.setEnabled(enabled);       
+        cbCreateDate.setEnabled(enabled);
         txtBase.setEditable(enabled);
         txtBase.setFocusable(enabled);
         txtCity.setEditable(enabled);
@@ -1113,7 +1126,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 spinnerCreateDate.setEnabled(true);
                 spinnerCreateDate.setValue(os.getCreateDate());
                 spinnerCreateDate.setEnabled(false);
-                
+
             }
             if (os.getBase() != null && os.getBase().trim().length() > 0) {
                 txtBase.setText(os.getBase());
@@ -1426,7 +1439,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         }
     }
 
-    private void instantiateOrderService() {
+    private OrderService instantiateOrderService() {
         if (!osDao.containsOrderService(txtId.getText().trim())) {
             OrderService os = new OrderService(txtId.getText().trim(), txtLote.getText().trim(),
                     txtAlim.getText().trim(), txtBase.getText().trim().toUpperCase(),
@@ -1447,19 +1460,17 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             os.setExpenditureType(ExpenditureType.valueOf(comboBoxExpenditure.getSelectedItem().toString()));
             os.setStatusService(StatusService.valueOf(comboBoxStatus.getSelectedItem().toString()));
 
-            if(osDao.insertOrderService(os) > 0){
-                this.os = os;
-                setMode(OrderServiceFormType.CONSULT_MODE);
-                JOptionPane.showMessageDialog(this, "Registrado!");
-                if(this.listener != null){
-                    this.listener.onDataChange(null);
-                }
-            }else{
-                JOptionPane.showMessageDialog(this, null, "Falha ao registrar serviço.", JOptionPane.ERROR);
-            }
+            return os;
+
         } else {
-            JOptionPane.showMessageDialog(this, "Serviço já cadastrado!");
+            if(type == OrderServiceFormType.NEW)
+                JOptionPane.showMessageDialog(this, "Serviço já cadastrado!");
+            return null;
         }
+    }
+
+    public int insertOrderService(OrderService os) {
+        return osDao.insertOrderService(os);
     }
 
 }
