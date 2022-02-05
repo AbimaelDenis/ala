@@ -6,19 +6,20 @@
 package com.mycompany.ala.dao;
 
 import com.mycompany.ala.entities.OrderService;
-import com.mycompany.ala.entities.Reserv;
+import java.sql.PreparedStatement;
+
 import java.util.List;
-import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  *
  * @author Abimael
  */
-public interface OrderServiceDao {
+public interface OrderServiceDao<T> {
     int insertOrderService(OrderService os);
     boolean containsOrderService(String id);
-    List<OrderService> findAllOpenServices();  
+    List<OrderService> findAllOpenServices(); 
+    OrderService findOrderServiceById(String id);
     void updateSapCheck(OrderService os);
-    void findReservById(OrderService os);
-    void deleteReservById(String id);
+    int updateField(String sql, Consumer<PreparedStatement> con);
 }

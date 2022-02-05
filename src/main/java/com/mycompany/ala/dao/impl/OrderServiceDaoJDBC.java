@@ -9,7 +9,6 @@ import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.dao.ReservDao;
 import com.mycompany.ala.db.DB;
-import com.mycompany.ala.entities.BudgetMaterial;
 import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
 import com.mycompany.ala.enums.ExpenditureType;
@@ -24,6 +23,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 /**
@@ -69,10 +69,10 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
 
         try {
             st = conn.prepareStatement("INSERT INTO orderservice (Id, Lote, Alimentador, Base, "
-                    + "Tipo, ObjetoTecnico, Localizacao, Km, R, Reserva, Descricao, "
+                    + "Tipo, ObjetoTecnico, Localizacao, Km, R, Reserva, Descricao, DataCriacao, "
                     + "DataRegistro, DataConclusao, DataEncerramento, Cidade, Fiscal, "
                     + "Situacao, TipoDespesa, Embargado) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             st.setString(1, os.getId());
             st.setString(2, os.getLote());
@@ -90,28 +90,33 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             st.setString(10, os.getReservsId().trim());
             st.setString(11, os.getDescription());
 
-            st.setDate(12, new java.sql.Date(os.getRegisterDate().getTime()));
-            if (os.getConclusionDate() != null) {
-                st.setDate(13, new java.sql.Date(os.getConclusionDate().getTime()));
+            if (os.getCreateDate() != null) {
+                st.setDate(12, new java.sql.Date(os.getCreateDate().getTime()));
             } else {
-                st.setDate(13, null);
+                st.setDate(12, null);
             }
-            if (os.getCloseDate() != null) {
-                st.setDate(14, new java.sql.Date(os.getCloseDate().getTime()));
+            st.setDate(13, new java.sql.Date(os.getRegisterDate().getTime()));
+            if (os.getConclusionDate() != null) {
+                st.setDate(14, new java.sql.Date(os.getConclusionDate().getTime()));
             } else {
                 st.setDate(14, null);
             }
+            if (os.getCloseDate() != null) {
+                st.setDate(15, new java.sql.Date(os.getCloseDate().getTime()));
+            } else {
+                st.setDate(15, null);
+            }
 
-            st.setString(15, os.getCity());
-            st.setString(16, os.getFiscal());
-            st.setString(17, os.getStatusService().toString());
+            st.setString(16, os.getCity());
+            st.setString(17, os.getFiscal());
+            st.setString(18, os.getStatusService().toString());
 
             if (os.getExpenditureType() != null) {
-                st.setString(18, os.getExpenditureType().toString());
+                st.setString(19, os.getExpenditureType().toString());
             } else {
-                st.setDate(18, null);
+                st.setDate(19, null);
             }
-            st.setBoolean(19, os.isEmbarg());
+            st.setBoolean(20, os.isEmbarg());
             return st.executeUpdate();
         } catch (SQLException e) {
             throw new DbException("Error in insertOrderService(): " + e.getMessage());
@@ -143,6 +148,26 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         }
     }
 
+    @Override
+    public OrderService findOrderServiceById(String id) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try {
+            st = conn.prepareStatement("SELECT*FROM orderservice WHERE Id = ?");
+            st.setString(1, id);
+            rs = st.executeQuery();
+            rs.next();
+            return instantiateOrderService(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error in findAllOpenServices(): " + e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
+    }
+    
+    
+
     private OrderService instantiateOrderService(ResultSet rs) throws SQLException {
         String id = rs.getString("Id");
         String lote = rs.getString("Lote");
@@ -155,6 +180,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         String R = rs.getString("R");
         String[] reservs = rs.getString("Reserva").split(" ");
         String decript = rs.getString("Descricao");
+        Date createDate = rs.getDate("DataCriacao");
         Date registerDate = rs.getDate("DataRegistro");
         Date conclusionDate = rs.getDate("DataConclusao");
         Date closeDate = rs.getDate("DataEncerramento");
@@ -172,7 +198,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             res.setService(os);
             os.addReserv(res);
         }
-
+        os.setCreateDate(createDate);
         os.setConclusionDate(conclusionDate);
         os.setCloseDate(closeDate);
         os.setCity(city);
@@ -225,12 +251,22 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
     }
 
     @Override
-    public void findReservById(OrderService os) {
-
+    public int updateField(String sql, Consumer con) {
+        PreparedStatement st = null;
+        
+        try{
+            st = conn.prepareStatement(sql);
+            con.accept(st);
+            return st.executeUpdate();
+        }catch(SQLException e){
+            throw new DbException("Error in updateField(): " + e.getMessage());
+        }finally{
+            DB.closeStatement(st);
+        }
     }
 
-    @Override
-    public void deleteReservById(String id) {
+    
+    
 
-    }
+   
 }

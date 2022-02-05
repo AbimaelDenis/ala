@@ -20,76 +20,92 @@ import javax.swing.table.AbstractTableModel;
  * @author Abimael
  */
 public class OrderServiceTableModel extends AbstractTableModel implements DataChangeListener {
-   
+
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private static List<OrderService> services = new ArrayList<>();
     private String[] columns = {"Id", "Lote", "Alimentador", "Km", "Obj. Técnico", "Local", "Base", "Projeto", "Reservas", "Tipo", "Status", "Data de Registro"};
-    
-    public OrderServiceTableModel(){
-        
+
+    public OrderServiceTableModel() {
+
     }
-    
+
     @Override
     public int getRowCount() {
-       return services.size();
+        return services.size();
     }
 
     @Override
     public int getColumnCount() {
         return columns.length;
     }
-    
+
     @Override
-    public String getColumnName(int column){
+    public String getColumnName(int column) {
         return columns[column];
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if(columnIndex == 0)
+        if (columnIndex == 0) {
             return services.get(rowIndex).getId();
-        if(columnIndex == 1)
+        }
+        if (columnIndex == 1) {
             return services.get(rowIndex).getLote();
-        if(columnIndex == 2)
+        }
+        if (columnIndex == 2) {
             return services.get(rowIndex).getAlim();
-        if(columnIndex == 3)
+        }
+        if (columnIndex == 3) {
             return services.get(rowIndex).getUnlockKm();
-        if(columnIndex == 4)
+        }
+        if (columnIndex == 4) {
             return services.get(rowIndex).getTechnicalObject();
-        if(columnIndex == 5)
+        }
+        if (columnIndex == 5) {
             return services.get(rowIndex).getLocal();
-        if(columnIndex == 6)
+        }
+        if (columnIndex == 6) {
             return services.get(rowIndex).getBase();
-        if(columnIndex == 7)
+        }
+        if (columnIndex == 7) {
             return services.get(rowIndex).getR();
-        if(columnIndex == 8)
+        }
+        if (columnIndex == 8) {
             return services.get(rowIndex).getReservsId();
-        if(columnIndex == 9)
+        }
+        if (columnIndex == 9) {
             return services.get(rowIndex).getServiceType();
-        if(columnIndex == 10)
+        }
+        if (columnIndex == 10) {
             return services.get(rowIndex).getStatusService();
-        else       
+        } else {
             return sdf.format(services.get(rowIndex).getRegisterDate());
+        }
     }
 
     @Override
     public void onDataChange(Object obj) {
-        services = DaoFactory.createOrderServiceDao().findAllOpenServices();
+        if (obj != null) {
+            int index = 0;
+            OrderService os = DaoFactory.createOrderServiceDao().findOrderServiceById(((OrderService) obj).getId());
+            for (OrderService o : services) {
+                if (o.getId().trim().equals(os.getId().trim())) {
+                    services.set(index, os);
+                }
+                index++;
+            }           
+        } else {
+            services = DaoFactory.createOrderServiceDao().findAllOpenServices();         
+        }
         this.fireTableDataChanged();
     }
-    
+
 //    public void updateServicesList(){ 
 //        services = DaoFactory.createOrderServiceDao().findAllOpenServices();
 //        this.fireTableDataChanged();
 //    }
-    
-    public OrderService getOrderService(int index){
+    public OrderService getOrderService(int index) {
         return services.get(index);
     }
-    
 
-   
-
-    
-    
 }

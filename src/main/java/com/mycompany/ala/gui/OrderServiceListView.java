@@ -181,8 +181,11 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnFilterActionPerformed
 
     private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
-        if (tbOrderServices.getSelectedRow() != -1)
-            createOrderServiceFormView(this.model.getOrderService(tbOrderServices.getSelectedRow()), OrderServiceFormType.CONSULT_MODE);
+        OrderServiceFormView form;
+        if (tbOrderServices.getSelectedRow() != -1){
+            form = createOrderServiceFormView(this.model.getOrderService(tbOrderServices.getSelectedRow()), OrderServiceFormType.CONSULT_MODE);
+            form.subscribeChangeListener(this.model);
+        }
         else
             JOptionPane.showMessageDialog(this, "Selecione um serviço.");
     }//GEN-LAST:event_btnConsultActionPerformed
@@ -198,7 +201,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
             String path = fc.getSelectedFile().getAbsolutePath();
 
             ImportSAPServicesData importSapServicesData = new ImportSAPServicesData(this, path);
-            importSapServicesData.subscribeDataChangeListener(model);
+            importSapServicesData.subscribeDataChangeListener(this.model);
             importSapServicesData.start();
 
         }
@@ -210,12 +213,12 @@ public class OrderServiceListView extends javax.swing.JFrame {
             String path = fc.getSelectedFile().getAbsolutePath();
 
             ImportServicesFromFile isff = new ImportServicesFromFile(this, path);
-            isff.subscribeDataChangeListener(model);
+            isff.subscribeDataChangeListener(this.model);
             isff.start();
         }
     }
 
-    private void createOrderServiceFormView(OrderService os, OrderServiceFormType type) {
+    private OrderServiceFormView createOrderServiceFormView(OrderService os, OrderServiceFormType type) {
         JDialog osfv = new JDialog(this, true);
         osfv.setResizable(false);
         OrderServiceFormView view = new OrderServiceFormView(os, type);
@@ -227,6 +230,8 @@ public class OrderServiceListView extends javax.swing.JFrame {
         osfv.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         osfv.setLocationRelativeTo(null);
         osfv.setVisible(true);
+        
+        return view;
 
     }
 
