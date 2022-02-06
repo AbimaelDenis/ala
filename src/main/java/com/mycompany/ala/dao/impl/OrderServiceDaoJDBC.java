@@ -15,6 +15,7 @@ import com.mycompany.ala.enums.ExpenditureType;
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
+import com.mycompany.ala.gui.ProgressInfoView;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 
 /**
@@ -128,6 +131,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
 
     @Override
     public List<OrderService> findAllOpenServices() {
+        
         List<OrderService> services = new ArrayList<>();
         Statement st = null;
         ResultSet rs = null;
@@ -139,6 +143,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             while (rs.next()) {
                 services.add(instantiateOrderService(rs));
             }
+            
             return services;
         } catch (SQLException e) {
             throw new DbException("Error in findAllOpenServices(): " + e.getMessage());
@@ -211,7 +216,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         }
         os.setEmbarg(embarg);
 
-        reservDao.findReservById(os);
+        reservDao.findReservsById(os);
         
         return os;
     }

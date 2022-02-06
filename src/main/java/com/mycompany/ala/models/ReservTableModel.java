@@ -5,7 +5,6 @@
  */
 package com.mycompany.ala.models;
 
-import com.mycompany.ala.entities.OrderService;
 import com.mycompany.ala.entities.Reserv;
 import com.mycompany.ala.services.DataChangeListener;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class ReservTableModel extends AbstractTableModel implements DataChangeLi
 
     private static List<Reserv> reservs = new ArrayList<>();
 
-    private String[] columns = {"Reserva"};
+    private String[] columns = {"Reserva", "Tipo"};
 
     public ReservTableModel() {
 
@@ -43,13 +42,20 @@ public class ReservTableModel extends AbstractTableModel implements DataChangeLi
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return reservs.get(rowIndex).getId();
+        if(columnIndex == 0)
+            return reservs.get(rowIndex).getId();
+        else{
+            if(reservs.get(rowIndex).getReservType() != null)
+                return reservs.get(rowIndex).getReservType().toString();
+            else
+                return "";
+        }
     }
 
     @Override
     public void onDataChange(Object obj) {
         if (obj instanceof Reserv) {
-            reservs.add((Reserv) obj);                      
+            reservs.add((Reserv) obj);
             this.fireTableDataChanged();
         }
     }
@@ -58,11 +64,20 @@ public class ReservTableModel extends AbstractTableModel implements DataChangeLi
         this.reservs = reservs;
     }
     
+    public void addReserv(Reserv reserv) {
+        reservs.add(reserv);
+    }
+
     public List<Reserv> getReservList() {
         return this.reservs;
     }
 
     public Reserv getReserv(int index) {
         return reservs.get(index);
+    }
+
+    public void removeReserv(int index) {
+        reservs.remove(index);
+        this.fireTableDataChanged();
     }
 }

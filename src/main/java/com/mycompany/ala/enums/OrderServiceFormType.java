@@ -13,5 +13,6 @@ public enum OrderServiceFormType {
     CONSULT_MODE,
     EDIT_MODE,
     NEW,
-    EMBARG_MODE;
+    EMBARG_MODE,
+    CLOSE_MODE;
 }

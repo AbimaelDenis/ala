@@ -17,7 +17,7 @@ import javax.swing.table.AbstractTableModel;
 public class MaterialTableModel extends AbstractTableModel{
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private Reserv reserv = null;
-    private String[] column = {"Reserva", "Código", "Descrição", "Unidade", "Orçado", "Atendido", "Data Ncessidate" , "Tipo"};
+    private String[] column = {"Reserva", "Código", "Descrição", "Unidade", "Orçado", "Atendido", "Data Ncessidate", "Recebedor" , "Tipo"};
     
     public MaterialTableModel(Reserv reserv){
         this.reserv = reserv;       
@@ -54,6 +54,8 @@ public class MaterialTableModel extends AbstractTableModel{
             return reserv.getBudgetMaterials().get(rowIndex).getDispatchedQauntity();
         if(columnIndex == 6)
             return sdf.format(reserv.getNeedDate());
+        if(columnIndex == 7)
+            return reserv.getReceptor();
         else
            return String.valueOf(reserv.getReservType()).replace("T", "");
         

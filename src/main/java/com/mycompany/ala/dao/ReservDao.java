@@ -14,6 +14,7 @@ import com.mycompany.ala.entities.Reserv;
  */
 public interface ReservDao {
     void insertReserv(Reserv reserv);
-    void findReservById(OrderService os);
+    void findReservsById(OrderService os);
+    Reserv findReservById(String id);
     void deleteReservById(String id);
 }

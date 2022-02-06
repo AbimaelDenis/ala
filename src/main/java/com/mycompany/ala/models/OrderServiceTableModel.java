@@ -7,12 +7,17 @@ package com.mycompany.ala.models;
 
 import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.exceptions.DbException;
+import com.mycompany.ala.gui.ProgressInfoView;
 
 import com.mycompany.ala.services.DataChangeListener;
+import java.awt.Component;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -20,13 +25,13 @@ import javax.swing.table.AbstractTableModel;
  * @author Abimael
  */
 public class OrderServiceTableModel extends AbstractTableModel implements DataChangeListener {
-
+    private static JFrame listView;
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private static List<OrderService> services = new ArrayList<>();
     private String[] columns = {"Id", "Lote", "Alimentador", "Km", "Obj. Técnico", "Local", "Base", "Projeto", "Reservas", "Tipo", "Status", "Data de Registro"};
 
-    public OrderServiceTableModel() {
-
+    public OrderServiceTableModel(JFrame listView) {
+        this.listView = listView;
     }
 
     @Override
@@ -85,6 +90,7 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
 
     @Override
     public void onDataChange(Object obj) {
+        try{
         if (obj != null) {
             int index = 0;
             OrderService os = DaoFactory.createOrderServiceDao().findOrderServiceById(((OrderService) obj).getId());
@@ -94,8 +100,11 @@ public class OrderServiceTableModel extends AbstractTableModel implements DataCh
                 }
                 index++;
             }           
-        } else {
-            services = DaoFactory.createOrderServiceDao().findAllOpenServices();         
+        } else {                     
+            services = DaoFactory.createOrderServiceDao().findAllOpenServices();              
+        }
+        }catch(DbException e){
+            JOptionPane.showMessageDialog(listView, "Erro na comunicação com o banco de dados: " + e.getMessage());
         }
         this.fireTableDataChanged();
     }

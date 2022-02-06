@@ -12,6 +12,7 @@ import com.mycompany.ala.services.ImportSAPServicesData;
 import com.mycompany.ala.services.ImportServicesFromFile;
 import com.mycompany.ala.util.DefaultFileChooser;
 
+
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -25,7 +26,7 @@ import javax.swing.ListSelectionModel;
  */
 public class OrderServiceListView extends javax.swing.JFrame {
 
-    private OrderServiceTableModel model = new OrderServiceTableModel();
+    private OrderServiceTableModel model = new OrderServiceTableModel(this);
 
     public OrderServiceListView() {
         initComponents();
@@ -44,6 +45,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbOrderServices = new javax.swing.JTable();
         jToolBar1 = new javax.swing.JToolBar();
@@ -53,15 +55,16 @@ public class OrderServiceListView extends javax.swing.JFrame {
         btnImport = new javax.swing.JButton();
         btnSap = new javax.swing.JButton();
         btnExport = new javax.swing.JButton();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        jMenuBar2 = new javax.swing.JMenuBar();
+        jMenu3 = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(0, 0, 0));
 
+        jPanel1.setBackground(new java.awt.Color(60, 60, 60));
+
+        tbOrderServices.setBackground(new java.awt.Color(220, 220, 220));
         tbOrderServices.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -75,9 +78,17 @@ public class OrderServiceListView extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tbOrderServices);
 
+        jToolBar1.setBackground(new java.awt.Color(60, 60, 60));
         jToolBar1.setRollover(true);
+        jToolBar1.setBorderPainted(false);
+        jToolBar1.setOpaque(false);
 
-        btnNew.setText("Novo");
+        btnNew.setForeground(new java.awt.Color(150, 150, 150));
+        btnNew.setIcon(new javax.swing.ImageIcon("C:\\Users\\Abimael\\Documents\\NetBeansProjects\\ala\\Resources\\icons\\registerIcon.png")); // NOI18N
+        btnNew.setBorder(null);
+        btnNew.setBorderPainted(false);
+        btnNew.setOpaque(false);
+        btnNew.setRequestFocusEnabled(false);
         btnNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNewActionPerformed(evt);
@@ -85,8 +96,13 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnNew);
 
-        btnConsult.setText("Consultar");
+        btnConsult.setForeground(new java.awt.Color(150, 150, 150));
+        btnConsult.setIcon(new javax.swing.ImageIcon("C:\\Users\\Abimael\\Documents\\NetBeansProjects\\ala\\Resources\\icons\\consult.png")); // NOI18N
         btnConsult.setToolTipText("");
+        btnConsult.setBorderPainted(false);
+        btnConsult.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnConsult.setOpaque(false);
+        btnConsult.setPreferredSize(new java.awt.Dimension(25, 25));
         btnConsult.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnConsultActionPerformed(evt);
@@ -94,7 +110,11 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnConsult);
 
-        btnFilter.setText("Filtrar");
+        btnFilter.setForeground(new java.awt.Color(150, 150, 150));
+        btnFilter.setIcon(new javax.swing.ImageIcon("C:\\Users\\Abimael\\Documents\\NetBeansProjects\\ala\\Resources\\icons\\filter.png")); // NOI18N
+        btnFilter.setBorder(null);
+        btnFilter.setBorderPainted(false);
+        btnFilter.setOpaque(false);
         btnFilter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnFilterActionPerformed(evt);
@@ -102,7 +122,11 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnFilter);
 
-        btnImport.setText("Importar");
+        btnImport.setForeground(new java.awt.Color(150, 150, 150));
+        btnImport.setIcon(new javax.swing.ImageIcon("C:\\Users\\Abimael\\Documents\\NetBeansProjects\\ala\\Resources\\icons\\import.png")); // NOI18N
+        btnImport.setBorderPainted(false);
+        btnImport.setOpaque(false);
+        btnImport.setPreferredSize(new java.awt.Dimension(25, 25));
         btnImport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnImportActionPerformed(evt);
@@ -110,9 +134,12 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnImport);
 
-        btnSap.setText("SAP");
+        btnSap.setForeground(new java.awt.Color(150, 150, 150));
+        btnSap.setIcon(new javax.swing.ImageIcon("C:\\Users\\Abimael\\Documents\\NetBeansProjects\\ala\\Resources\\icons\\SAP.png")); // NOI18N
+        btnSap.setBorderPainted(false);
         btnSap.setFocusable(false);
         btnSap.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnSap.setOpaque(false);
         btnSap.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         btnSap.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -121,52 +148,67 @@ public class OrderServiceListView extends javax.swing.JFrame {
         });
         jToolBar1.add(btnSap);
 
-        btnExport.setText("Exportar");
+        btnExport.setForeground(new java.awt.Color(150, 150, 150));
+        btnExport.setIcon(new javax.swing.ImageIcon("C:\\Users\\Abimael\\Documents\\NetBeansProjects\\ala\\Resources\\icons\\export.png")); // NOI18N
+        btnExport.setBorder(null);
+        btnExport.setBorderPainted(false);
         btnExport.setFocusable(false);
         btnExport.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnExport.setMargin(new java.awt.Insets(10, 14, 10, 14));
+        btnExport.setOpaque(false);
         btnExport.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnExport);
 
-        jMenu1.setText("Serviços");
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 957, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 582, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 608, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
-        jMenuItem1.setText("Ordem de Serviço");
-        jMenu1.add(jMenuItem1);
+        jMenuBar2.setBackground(new java.awt.Color(60, 60, 60));
+        jMenuBar2.setForeground(new java.awt.Color(150, 150, 150));
+        jMenuBar2.setBorderPainted(false);
 
-        jMenuItem2.setText("Projeto");
-        jMenu1.add(jMenuItem2);
+        jMenu3.setForeground(new java.awt.Color(150, 150, 150));
+        jMenu3.setText("File");
+        jMenuBar2.add(jMenu3);
 
-        jMenuItem3.setText("Ocorrência");
-        jMenu1.add(jMenuItem3);
+        jMenu4.setForeground(new java.awt.Color(150, 150, 150));
+        jMenu4.setText("Edit");
+        jMenuBar2.add(jMenu4);
 
-        jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Sobre");
-        jMenuBar1.add(jMenu2);
-
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(jMenuBar2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 957, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnExport)
-                .addGap(16, 16, 16))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnExport, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 565, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -181,9 +223,9 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnFilterActionPerformed
 
     private void btnConsultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultActionPerformed
-        OrderServiceFormView form;
+         
         if (tbOrderServices.getSelectedRow() != -1){
-            form = createOrderServiceFormView(this.model.getOrderService(tbOrderServices.getSelectedRow()), OrderServiceFormType.CONSULT_MODE);
+            OrderServiceFormView form = createOrderServiceFormView(this.model.getOrderService(tbOrderServices.getSelectedRow()), OrderServiceFormType.CONSULT_MODE);
             form.subscribeChangeListener(this.model);
         }
         else
@@ -191,7 +233,7 @@ public class OrderServiceListView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnConsultActionPerformed
 
     private void btnImportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportActionPerformed
-        importServicesFromFile();
+        importDataFromFile();
     }//GEN-LAST:event_btnImportActionPerformed
 
     private void btnSapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSapActionPerformed
@@ -206,12 +248,16 @@ public class OrderServiceListView extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_btnSapActionPerformed
-    private void importServicesFromFile() {
+
+    private void btnExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnExportActionPerformed
+    private void importDataFromFile() {
         JFileChooser fc = DefaultFileChooser.createFileChooser();
         int result = fc.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
-
+            
             ImportServicesFromFile isff = new ImportServicesFromFile(this, path);
             isff.subscribeDataChangeListener(this.model);
             isff.start();
@@ -281,12 +327,10 @@ public class OrderServiceListView extends javax.swing.JFrame {
     private javax.swing.JButton btnImport;
     private javax.swing.JButton btnNew;
     private javax.swing.JButton btnSap;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenuBar jMenuBar2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JTable tbOrderServices;

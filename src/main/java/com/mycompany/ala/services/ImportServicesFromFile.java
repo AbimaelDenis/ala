@@ -119,7 +119,7 @@ public class ImportServicesFromFile extends Thread {
         }      
     }
     
-    private String loadId(String id) throws ServiceException {
+    public static String loadId(String id) throws ServiceException {
         String prefix;
         String[] newId = id.split("/");
         try{
