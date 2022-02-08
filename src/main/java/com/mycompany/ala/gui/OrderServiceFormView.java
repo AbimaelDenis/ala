@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -174,6 +175,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jScrollPane5 = new javax.swing.JScrollPane();
         tbMaterialRequest = new javax.swing.JTable();
         btnRemoveReserv = new javax.swing.JButton();
+        btnExportRequest = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -234,6 +236,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         });
 
+        btnLog.setBackground(new java.awt.Color(60, 60, 60));
+        btnLog.setForeground(new java.awt.Color(200, 200, 200));
         btnLog.setText("Log");
 
         txtAlim.addActionListener(new java.awt.event.ActionListener() {
@@ -295,6 +299,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         jLabel22.setForeground(new java.awt.Color(100, 100, 100));
         jLabel22.setText("Status");
 
+        btnEdit.setBackground(new java.awt.Color(60, 60, 60));
+        btnEdit.setForeground(new java.awt.Color(200, 200, 200));
         btnEdit.setText("Editar");
         btnEdit.setFocusable(false);
         btnEdit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -328,6 +334,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             }
         });
 
+        btnAddReserv.setBackground(new java.awt.Color(60, 60, 60));
+        btnAddReserv.setForeground(new java.awt.Color(200, 200, 200));
         btnAddReserv.setText("Add");
         btnAddReserv.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -685,10 +693,21 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         ));
         jScrollPane3.setViewportView(tbReserv);
 
+        btnMaterialRequest.setBackground(new java.awt.Color(60, 60, 60));
+        btnMaterialRequest.setForeground(new java.awt.Color(200, 200, 200));
         btnMaterialRequest.setText("Requisitar");
+        btnMaterialRequest.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMaterialRequestActionPerformed(evt);
+            }
+        });
 
+        btnNewProg.setBackground(new java.awt.Color(60, 60, 60));
+        btnNewProg.setForeground(new java.awt.Color(200, 200, 200));
         btnNewProg.setText("Programar");
 
+        btnProgEdit.setBackground(new java.awt.Color(60, 60, 60));
+        btnProgEdit.setForeground(new java.awt.Color(200, 200, 200));
         btnProgEdit.setText("Editar");
 
         tbProg.setBackground(new java.awt.Color(200, 255, 200));
@@ -720,10 +739,21 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         ));
         jScrollPane5.setViewportView(tbMaterialRequest);
 
+        btnRemoveReserv.setBackground(new java.awt.Color(60, 60, 60));
+        btnRemoveReserv.setForeground(new java.awt.Color(200, 200, 200));
         btnRemoveReserv.setText("Remover");
         btnRemoveReserv.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRemoveReservActionPerformed(evt);
+            }
+        });
+
+        btnExportRequest.setBackground(new java.awt.Color(60, 60, 60));
+        btnExportRequest.setForeground(new java.awt.Color(200, 200, 200));
+        btnExportRequest.setText("Exportar");
+        btnExportRequest.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportRequestActionPerformed(evt);
             }
         });
 
@@ -746,7 +776,10 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                             .addComponent(btnRemoveReserv))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnMaterialRequest)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(btnMaterialRequest)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnExportRequest))
                             .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
                 .addContainerGap())
         );
@@ -762,7 +795,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnMaterialRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnRemoveReserv, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExportRequest, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
@@ -954,10 +988,19 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Reserva não selecionada !");
     }//GEN-LAST:event_btnRemoveReservActionPerformed
 
+    private void btnMaterialRequestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialRequestActionPerformed
+        createMaterialRequestView(this);
+    }//GEN-LAST:event_btnMaterialRequestActionPerformed
+
+    private void btnExportRequestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportRequestActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnExportRequestActionPerformed
+
     public void setMode(OrderServiceFormType type) {
         this.type = type;
         switch (type) {
             case CONSULT_MODE:
+                txtReserv.setText("");
                 txtId.setEditable(false);
                 enabledComponents(false);
                 for (Component t : ((JPanel) getRootPane().getContentPane().getComponents()[0]).getComponents()) {
@@ -993,6 +1036,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 lblCloseDate.setText("");
                 break;
             case EMBARG_MODE:
+                txtReserv.setText("");
                 txtId.setEditable(false);
                 enabledComponents(false);
                 btnMaterialRequest.setEnabled(true);
@@ -1002,6 +1046,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                 btnEdit.setText("Editar");
                 break;
             case CLOSE_MODE:
+                txtReserv.setText("");
                 txtId.setEditable(false);
                 enabledComponents(false);
                 spinnerCreateDate.setEnabled(false);
@@ -1085,6 +1130,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddReserv;
     private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnExportRequest;
     private javax.swing.JButton btnLog;
     private javax.swing.JButton btnMaterialRequest;
     private javax.swing.JButton btnNewProg;
@@ -1468,6 +1514,35 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         tbMaterialRequest.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbReserv.setModel(reservTableModel);
         tbReserv.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        JDialog materialDialog = new JDialog(this, true);
+        materialDialog.setTitle("Material");
+        tbReserv.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+
+                    MaterialView materialView = new MaterialView(reservTableModel.getReserv(tbReserv.getSelectedRow()));
+                    materialDialog.setContentPane(materialView.getContentPane());
+                    materialDialog.setSize(materialView.getSize());
+                    materialDialog.setVisible(true);
+
+                }
+            }
+
+            public void mousePressed(MouseEvent e) {
+            }
+
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            public void mouseExited(MouseEvent e) {
+            }
+
+        });
         if (os != null) {
             if (os.getReservsId().trim().length() > 0) {
                 reservTableModel.setReservList(new ArrayList<>());
@@ -1475,34 +1550,6 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                     reservTableModel.addReserv(r);
                 }
 
-                JDialog materialDialog = new JDialog(this, true);
-                materialDialog.setTitle("Material");
-                tbReserv.addMouseListener(new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getClickCount() == 2) {
-
-                            MaterialView materialView = new MaterialView(reservTableModel.getReserv(tbReserv.getSelectedRow()));
-                            materialDialog.setContentPane(materialView.getContentPane());
-                            materialDialog.setSize(materialView.getSize());
-                            materialDialog.setVisible(true);
-
-                        }
-                    }
-
-                    public void mousePressed(MouseEvent e) {
-                    }
-
-                    public void mouseReleased(MouseEvent e) {
-                    }
-
-                    public void mouseEntered(MouseEvent e) {
-                    }
-
-                    public void mouseExited(MouseEvent e) {
-                    }
-
-                });
             } else {
                 reservTableModel.setReservList(new ArrayList<>());
             }
@@ -1514,7 +1561,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             String id = ImportServicesFromFile.loadId(txtId.getText());
             if ((!osDao.containsOrderService(id.trim()) && type == OrderServiceFormType.NEW)
                     || type == OrderServiceFormType.EDIT_MODE) {
-                               
+
                 OrderService os = new OrderService(id.trim(), txtLote.getText().trim(),
                         txtAlim.getText().trim(), txtBase.getText().trim().toUpperCase(),
                         ServiceType.valueOf(comboBoxType.getSelectedItem().toString()),
@@ -1563,6 +1610,17 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Erro na comunicação com o banco de dados: " + e.getMessage());
         }
         return -1;
+    }
+
+    private void createMaterialRequestView(JFrame parentFrame) {
+        JDialog requestView = new JDialog(parentFrame, true);
+        requestView.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        requestView.setLocationRelativeTo(null);
+        MaterialRequestView mrv = new MaterialRequestView();
+        requestView.setContentPane(mrv.getContentPane());
+        requestView.setSize(mrv.getSize());
+        requestView.setLocationRelativeTo(null);
+        requestView.setVisible(true);
     }
 
 }
