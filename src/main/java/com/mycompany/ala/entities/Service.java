@@ -33,9 +33,9 @@ public abstract class Service {
     private StatusService statusService;//
     private boolean embarg;
     
-    private Request request;
     private List<Log> logs = new ArrayList<>();//
     private List<Reserv> reservs = new ArrayList<>();
+    private List<RequestMaterial> request = new ArrayList<>();
     private List<Prog> progs = new ArrayList<>();//
         
     public Service (String id, Date registerDate, String base){
@@ -147,6 +147,18 @@ public abstract class Service {
     
     public void addReserv(Reserv reserv){
         reservs.add(reserv);
+    }
+
+    public List<RequestMaterial> getRequest() {
+        return request;
+    }
+
+    public void setRequest(List<RequestMaterial> request) {
+        this.request = request;
+    }
+    
+    public void addRequestMaterial(RequestMaterial material) {
+        request.add(material);
     }
 
     public List<Reserv> getReservs() {

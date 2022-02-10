@@ -5,6 +5,7 @@
  */
 package com.mycompany.ala.models;
 
+import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.entities.Material;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import javax.swing.table.AbstractTableModel;
  * @author Abimael
  */
 public class BasicMaterialTableModel extends AbstractTableModel {
-    private static List<Material> materials = new ArrayList<>();
+    private static List<Material> materials = DaoFactory.createMaterialDao().findAll();
     private String[] columns = {"Código", "Descrição", "Unidade"};
     
     @Override
@@ -44,6 +45,10 @@ public class BasicMaterialTableModel extends AbstractTableModel {
         else{
             return materials.get(rowIndex).getUnits();
         }
+    }
+    
+    public Material getMaterial(int index){
+        return materials.get(index);
     }
     
 }

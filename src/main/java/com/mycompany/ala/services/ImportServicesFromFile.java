@@ -120,16 +120,16 @@ public class ImportServicesFromFile extends Thread {
             listeners.forEach(x -> x.onDataChange(null));
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(parentView, e.getMessage());
+            JOptionPane.showMessageDialog(parentView, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (IllegalArgumentException e1) {
             e1.printStackTrace();
-            JOptionPane.showMessageDialog(parentView, e1.getMessage());
+            JOptionPane.showMessageDialog(parentView, e1.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (ServiceException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(parentView, e.getMessage());
+            JOptionPane.showMessageDialog(parentView, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         } catch (DbException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(parentView, e.getMessage());
+            JOptionPane.showMessageDialog(parentView, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 

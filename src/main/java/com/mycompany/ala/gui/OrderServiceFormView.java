@@ -1616,7 +1616,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         JDialog requestView = new JDialog(parentFrame, true);
         requestView.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         requestView.setLocationRelativeTo(null);
-        MaterialRequestView mrv = new MaterialRequestView();
+        MaterialRequestView mrv = new MaterialRequestView(this.os);
         requestView.setContentPane(mrv.getContentPane());
         requestView.setSize(mrv.getSize());
         requestView.setLocationRelativeTo(null);

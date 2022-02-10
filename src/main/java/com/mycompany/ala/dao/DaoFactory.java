@@ -5,6 +5,7 @@
  */
 package com.mycompany.ala.dao;
 
+import com.mycompany.ala.dao.impl.MaterialDaoJDBC;
 import com.mycompany.ala.dao.impl.OrderServiceDaoJDBC;
 import com.mycompany.ala.dao.impl.ReservDaoJDBC;
 import com.mycompany.ala.db.DB;
@@ -21,5 +22,9 @@ public class DaoFactory {
     
     public static ReservDao createReservDao(){
         return new ReservDaoJDBC(DB.getConnection());
+    }
+    
+    public static MaterialDao createMaterialDao(){
+        return new MaterialDaoJDBC(DB.getConnection());
     }
 }

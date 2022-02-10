@@ -15,7 +15,6 @@ import com.mycompany.ala.enums.ExpenditureType;
 import com.mycompany.ala.enums.ServiceType;
 import com.mycompany.ala.enums.StatusService;
 import com.mycompany.ala.exceptions.DbException;
-import com.mycompany.ala.gui.ProgressInfoView;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,8 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
+
 
 
 /**

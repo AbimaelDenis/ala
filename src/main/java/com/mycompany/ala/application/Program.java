@@ -6,7 +6,14 @@
 package com.mycompany.ala.application;
 
 
+import com.mycompany.ala.dao.DaoFactory;
+import com.mycompany.ala.dao.MaterialDao;
+import com.mycompany.ala.entities.Material;
 import com.mycompany.ala.gui.OrderServiceListView;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 
 /**
@@ -18,5 +25,32 @@ public class Program {
         OrderServiceListView oslv = new OrderServiceListView();
         oslv.setTitle("Ordens de Serviço");
         oslv.setVisible(true);  
+        
+//        MaterialDao dao = DaoFactory.createMaterialDao();
+//        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("F:\\basicMaterial.txt"), "UTF-8"))){
+//            String line = br.readLine();
+//            line = br.readLine();
+//            String[] field;
+//            while(line != null){
+//                field = line.split(";");
+//                String code = "";
+//                if(field[1].contains("MUDOU")){
+//                    if(field[2].toUpperCase().contains("FORA")){
+//                        code = field[0];
+//                    }else{
+//                        code = field[2];
+//                    }
+//                }else{
+//                    code = field[0];
+//                }
+//                String descript = field[3];
+//                String unit = field[4];
+//                Material material = new Material(code, descript, unit);
+//                dao.insert(material);
+//                line = br.readLine();
+//            }
+//        }catch(IOException e){
+//            e.printStackTrace();
+//        }
     }
 }

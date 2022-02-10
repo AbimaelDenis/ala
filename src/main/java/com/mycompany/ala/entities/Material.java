@@ -5,16 +5,17 @@
  */
 package com.mycompany.ala.entities;
 
-import java.util.Date;
+
+import java.util.Objects;
 
 /**
  *
  * @author Abimael
  */
-public abstract class Material {
+public class Material {
     private String code;
     private String description;  
-    private Double dispatchedQauntity;  
+    private Double dispatchedQuantity;  
     private String units;
 
     public Material(String code, String description, String units) {
@@ -40,11 +41,11 @@ public abstract class Material {
     }
   
     public Double getDispatchedQauntity() {
-        return dispatchedQauntity;
+        return dispatchedQuantity;
     }
 
-    public void setDispatchedQauntity(Double dispatchedQauntity) {
-        this.dispatchedQauntity = dispatchedQauntity;
+    public void setDispatchedQuantity(Double dispatchedQauntity) {
+        this.dispatchedQuantity = dispatchedQauntity;
     }
     
     public String getUnits() {
@@ -54,4 +55,31 @@ public abstract class Material {
     public void setUnits(String units) {
         this.units = units;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.code);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Material other = (Material) obj;
+        if (!Objects.equals(this.code, other.code)) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }

@@ -154,7 +154,7 @@ public class ImportSAPServicesData extends Thread {
                             Double.parseDouble(budgetQuantity.replace(".", "")),
                             currentReserv);
                     String dispatchedQuantity = fields[13].trim().replace(".", "");
-                    bm.setDispatchedQauntity(Double.parseDouble(dispatchedQuantity.replace(",", ".")));
+                    bm.setDispatchedQuantity(Double.parseDouble(dispatchedQuantity.replace(",", ".")));
                     if (currentReserv.getNeedDate() == null) {
                         currentReserv.setNeedDate(sdf.parse(fields[9].trim().replace(".", "/")));
                     }

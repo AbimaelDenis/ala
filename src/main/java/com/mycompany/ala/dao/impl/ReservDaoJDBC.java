@@ -62,7 +62,7 @@ public class ReservDaoJDBC implements ReservDao {
                     reserv.setNeedDate(needDate);
                     reserv.setReservType(type);
                     BudgetMaterial bm = new BudgetMaterial(code, descrip, unit, budgetQuantity, reserv);
-                    bm.setDispatchedQauntity(dispatchedQuantity);
+                    bm.setDispatchedQuantity(dispatchedQuantity);
                     budgetMaterials.add(bm);
                 }
 
@@ -101,7 +101,7 @@ public class ReservDaoJDBC implements ReservDao {
                 reserv.setNeedDate(needDate);
                 reserv.setReservType(type);
                 BudgetMaterial bm = new BudgetMaterial(code, descrip, unit, budgetQuantity, reserv);
-                bm.setDispatchedQauntity(dispatchedQuantity);
+                bm.setDispatchedQuantity(dispatchedQuantity);
                 budgetMaterials.add(bm);
             }
             reserv.setBudgetMaterials(budgetMaterials);

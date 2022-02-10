@@ -5,24 +5,41 @@
  */
 package com.mycompany.ala.gui;
 
+import com.mycompany.ala.entities.Material;
+import com.mycompany.ala.entities.RequestMaterial;
+import com.mycompany.ala.entities.Service;
+import com.mycompany.ala.exceptions.DbException;
 import com.mycompany.ala.models.BasicMaterialTableModel;
 import com.mycompany.ala.models.CustomMaterialTableModel;
 import com.mycompany.ala.models.RequestMaterialTableModel;
+import com.mycompany.ala.util.DoubleConstraint;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 
 /**
  *
  * @author Abimael
  */
 public class MaterialRequestView extends javax.swing.JFrame {
+
+    private Service service;
     private static RequestMaterialTableModel requestMatModel = new RequestMaterialTableModel();
     private static BasicMaterialTableModel basicMatModel = new BasicMaterialTableModel();
     private static CustomMaterialTableModel customMatModel = new CustomMaterialTableModel();
+
     /**
      * Creates new form TestFrame
      */
-    public MaterialRequestView() {
+    public MaterialRequestView(Service service) {
         initComponents();
+        configFields();
         configTables();
+        if (service != null) {
+            this.service = service;
+            this.requestMatModel.setRequestMaterials(this.service.getRequest());
+        }
     }
 
     /**
@@ -70,6 +87,11 @@ public class MaterialRequestView extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tbBasicMaterirals);
 
         btnAddBasicMaterial.setText("Inserir");
+        btnAddBasicMaterial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddBasicMaterialActionPerformed(evt);
+            }
+        });
 
         btnAddCustomMaterial.setText("Inserir");
 
@@ -151,10 +173,11 @@ public class MaterialRequestView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAddCustomMaterial)
-                    .addComponent(btnModifierMaterial)
-                    .addComponent(jLabel1))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnAddCustomMaterial)
+                        .addComponent(btnModifierMaterial)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -210,6 +233,27 @@ public class MaterialRequestView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAddBasicMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBasicMaterialActionPerformed
+        if (this.service != null) {
+            Material material = basicMatModel.getMaterial(tbBasicMaterirals.getSelectedRow());
+            if (txtQuantMaterial.getText().trim().length() > 0 && Double.parseDouble(txtQuantMaterial.getText().trim()) != 0.0) {
+                RequestMaterial requestMaterial = new RequestMaterial(service.getId(), material.getCode(),
+                        material.getDescription(), material.getUnits(),
+                        Double.parseDouble(txtQuantMaterial.getText()));
+                
+                try {
+                    requestMatModel.addMaterial(requestMaterial);
+                } catch (DbException e) {
+                    JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Digite uma quantidade válida.", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Serviço não identificado.", "Erro", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnAddBasicMaterialActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -241,7 +285,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MaterialRequestView().setVisible(true);
+                new MaterialRequestView(null).setVisible(true);
             }
         });
     }
@@ -269,6 +313,24 @@ public class MaterialRequestView extends javax.swing.JFrame {
     private void configTables() {
         tbRequestMaterials.setModel(requestMatModel);
         tbBasicMaterirals.setModel(basicMatModel);
+        tbBasicMaterirals.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbCustomMaterials.setModel(customMatModel);
+    }
+
+    private void configFields() {
+        txtQuantMaterial.setDocument(new DoubleConstraint(6));
+        txtSearchMaterial.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
     }
 }
