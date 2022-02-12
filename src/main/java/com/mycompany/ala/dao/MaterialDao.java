@@ -7,6 +7,7 @@ package com.mycompany.ala.dao;
 
 import com.mycompany.ala.entities.Material;
 import com.mycompany.ala.entities.RequestMaterial;
+import com.mycompany.ala.entities.Structure;
 import java.util.List;
 
 /**
@@ -18,4 +19,5 @@ public interface MaterialDao {
     List<Material> findAll();
     int insertRequest(RequestMaterial material);
     List<RequestMaterial> findRequest(String serviceId);
+    List<Structure> findAllStructure();
 }

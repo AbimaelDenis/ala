@@ -13,6 +13,7 @@ import com.mycompany.ala.models.BasicMaterialTableModel;
 import com.mycompany.ala.models.CustomMaterialTableModel;
 import com.mycompany.ala.models.RequestMaterialTableModel;
 import com.mycompany.ala.util.DoubleConstraint;
+import com.mycompany.ala.util.UpperCaseConstraint;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JOptionPane;
@@ -58,7 +59,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
         txtQuantMaterial = new javax.swing.JTextField();
         btnAddBasicMaterial = new javax.swing.JButton();
         btnAddCustomMaterial = new javax.swing.JButton();
-        btnModifierMaterial = new javax.swing.JButton();
+        btnRemoveGroup = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -68,6 +69,8 @@ public class MaterialRequestView extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbRequestMaterials = new javax.swing.JTable();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -95,7 +98,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
 
         btnAddCustomMaterial.setText("Inserir");
 
-        btnModifierMaterial.setText("Alterar");
+        btnRemoveGroup.setText("Remover");
 
         jLabel1.setFont(new java.awt.Font("Dialog", 3, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(100, 100, 100));
@@ -146,7 +149,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE)
-                        .addComponent(btnModifierMaterial)
+                        .addComponent(btnRemoveGroup)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAddCustomMaterial))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -171,13 +174,13 @@ public class MaterialRequestView extends javax.swing.JFrame {
                     .addComponent(btnAddBasicMaterial)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(btnAddCustomMaterial)
-                        .addComponent(btnModifierMaterial)))
+                        .addComponent(btnRemoveGroup)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -198,20 +201,37 @@ public class MaterialRequestView extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(tbRequestMaterials);
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(jTable1);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+            .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 627, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 439, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -293,7 +313,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddBasicMaterial;
     private javax.swing.JButton btnAddCustomMaterial;
-    private javax.swing.JButton btnModifierMaterial;
+    private javax.swing.JButton btnRemoveGroup;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -303,6 +323,8 @@ public class MaterialRequestView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JTable jTable1;
     private javax.swing.JTable tbBasicMaterirals;
     private javax.swing.JTable tbCustomMaterials;
     private javax.swing.JTable tbRequestMaterials;
@@ -319,6 +341,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
 
     private void configFields() {
         txtQuantMaterial.setDocument(new DoubleConstraint(6));
+        txtSearchMaterial.setDocument(new UpperCaseConstraint(50));
         txtSearchMaterial.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -330,6 +353,8 @@ public class MaterialRequestView extends javax.swing.JFrame {
 
             @Override
             public void keyReleased(KeyEvent e) {
+                String content = txtSearchMaterial.getText().trim();
+                basicMatModel.setFilter(m -> m.getDescription().contains(content) || m.getCode().contains(content));
             }
         });
     }
