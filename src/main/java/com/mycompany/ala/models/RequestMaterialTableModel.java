@@ -20,11 +20,12 @@ import javax.swing.table.AbstractTableModel;
  * @author Abimael
  */
 public class RequestMaterialTableModel extends AbstractTableModel {
+
     private static DataChangeListener listener;
     private static MaterialDao materialDao = DaoFactory.createMaterialDao();
     private List<RequestMaterial> requestMaterials = new ArrayList<>();
     private List<RequestMaterial> basicRequestMaterials = new ArrayList<>();
-    private List<RequestMaterial> structuriesRequestMaterials = new ArrayList<>();   
+    private List<RequestMaterial> structuriesRequestMaterials = new ArrayList<>();
     private List<Material> budgetMaterials = new ArrayList<>();
     private String[] columns = {"Código", "Descrição", "Unidade", "Requisitado"};
 
@@ -53,31 +54,37 @@ public class RequestMaterialTableModel extends AbstractTableModel {
         }
         if (columnIndex == 2) {
             return basicRequestMaterials.get(rowIndex).getUnits();
-        }
-        else {
+        } else {
             return basicRequestMaterials.get(rowIndex).getRequestQuantity();
         }
-        
+
     }
 
     public void addMaterial(RequestMaterial material) {
         if (requestMaterials.contains(material)) {
-            for (RequestMaterial mat : requestMaterials) {
-                if (mat.equals(material)) {                                                         
-                    mat.setRequestQuantity(material.getRequestQuantity());
-                    updateBasicList();
+            if (material.getRequestQuantity() > 0) {
+                for (RequestMaterial mat : requestMaterials) {
+                    if (mat.equals(material)) {
+                        mat.setRequestQuantity(material.getRequestQuantity());
+                        updateBasicList();
+                    }
                 }
+            }else{
+                requestMaterials.remove(material);
+                updateBasicList();
             }
         } else {
             requestMaterials.add(material);
             updateBasicList();
         }
+        dataChanged();
         this.fireTableDataChanged();
     }
-    
-    public void updateStructureMaterial(List<RequestMaterial> structureMaterials) {       
+
+    public void updateStructureMaterial(List<RequestMaterial> structureMaterials) {
         this.structuriesRequestMaterials = structureMaterials;
         updateBasicList();
+        dataChanged();
         this.fireTableDataChanged();
     }
 
@@ -90,24 +97,33 @@ public class RequestMaterialTableModel extends AbstractTableModel {
     public List<RequestMaterial> getRequestMaterials() {
         return this.requestMaterials;
     }
-    
+
     public List<RequestMaterial> getBasicRequestMaterials() {
         return this.basicRequestMaterials;
     }
 
+    public RequestMaterial getRequestBasicMaterial(int index) {
+        return this.basicRequestMaterials.get(index);
+    }
+
     private void updateBasicList() {
         this.basicRequestMaterials = requestMaterials.stream().filter(m -> !m.isStructure()).collect(Collectors.toList());
-        for(RequestMaterial material : structuriesRequestMaterials){
-            basicRequestMaterials.add(material);
+        for (RequestMaterial material : structuriesRequestMaterials) {
+            if(material.getRequestQuantity() > 0)
+                basicRequestMaterials.add(material);
         }
-        if(listener != null){
-            listener.onDataChange(null);
-        }
+        
     }
-    
-    public void subscribeListener(DataChangeListener listener){
+
+    public void subscribeListener(DataChangeListener listener) {
         this.listener = listener;
     }
     
-    
+    private void dataChanged(){
+        //OrderServiceFormView update tbRequestMaterial
+        if (listener != null) {
+            listener.onDataChange(null);
+        }
+    }
+
 }

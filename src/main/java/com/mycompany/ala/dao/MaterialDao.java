@@ -18,7 +18,8 @@ import java.util.List;
 public interface MaterialDao {
     void insert(Material material);
     List<Material> findAll();
-    int insertRequest(RequestMaterial material);
+    int insertOrUpdateRequest(RequestMaterial material);
+    int deleteRequest(RequestMaterial material);
     List<RequestMaterial> findRequest(String serviceId);
     List<Structure> findAllStructure();
     void findStructureMaterial(Structure structure, String serviceId);

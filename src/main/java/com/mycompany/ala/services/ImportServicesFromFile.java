@@ -72,8 +72,8 @@ public class ImportServicesFromFile extends Thread {
                     }
                 }
                 String reservs = "";
-                if (column[9].matches("(?s).*[Rr][eE][sS][eE][rR][vV][aA][sS]?\\s*[:;-]\\s*\n?[:;-]?\\s*(\\d{6,9}\\s*[,.;:-]?\\s*)+.*")) {                    
-                    reservs = column[9].replaceAll("(?s).*[Rr][eE][sS][eE][rR][vV][aA][sS]?\\s*[:;-]\\s*\n?[:;-]?\\s*((\\d{6,9}\\s*[,.;:-]?\\s*)+).*", "$1").replaceAll("(\\d{6,9})\\s*[,.;:-]?\\s*", "$1 ").replace("\n", "");
+                if (column[9].matches("(?s).*[Rr][eE][sS][eE][rR][vV][aA][sS]?\\s*[:;-]\\s*\n?[:;-]?\\s*(\\d{6,9}\\s*[,.;:eE-]?\\s*)+.*")) {                    
+                    reservs = column[9].replaceAll("(?s).*[Rr][eE][sS][eE][rR][vV][aA][sS]?\\s*[:;-]\\s*\n?[:;-]?\\s*((\\d{6,9}\\s*[,.;:eE-]?\\s*)+).*", "$1").replaceAll("(\\d{6,9})\\s*[,.;:-]?\\s*", "$1 ").replace("\n", "");
                     System.out.println(reservs);
                 }               
 
@@ -139,7 +139,7 @@ public class ImportServicesFromFile extends Thread {
         try {
             if (newId[0].trim().replace(" ", "").length() > 5 && newId[1].length() == 4) {
                 prefix = newId[0].replace(" ", "").trim().substring(0, 4);
-                if (prefix.matches("[+-]?\\d*(\\.\\d+)?") || prefix.matches(".*\\d.*")) //verifica se o prefix é um número ou contem algum
+                if (prefix.matches("\\d*(\\.\\d+)?") || prefix.matches(".*\\d.*")) //verifica se o prefix é um número ou contem algum
                 {
                     throw new ServiceException("Error of prefix in loadId() in line: ");
                 }
@@ -164,7 +164,7 @@ public class ImportServicesFromFile extends Thread {
                     reserv = reservs.trim().split(" ");
                 }
                 for (String r : reserv) {
-                    if (r.trim().length() > 4 && r.trim().matches("[+-]?\\d*(\\.\\d+)?")) {
+                    if (r.trim().length() > 4 && r.trim().matches("\\d*(\\.\\d+)?")) {
                         r.replace(" ", "");
                         Reserv res = new Reserv(r.trim());
                         res.setService(orderService);
@@ -179,7 +179,7 @@ public class ImportServicesFromFile extends Thread {
                 }
                 orderService.setExpenditureType(ExpenditureType.CUSTEIO);
             } else {
-                if (reservs.trim().replace("R", "").replace("-", "").matches("[+-]?\\d*(\\.\\d+)?")) {
+                if (reservs.trim().replace("R", "").replace("-", "").matches("[-]?\\d*(\\.\\d+)?")) {
                     int r = Integer.parseInt(reservs.trim().replace("R", "").replace("-", ""));
                     orderService.setR(String.valueOf(r));
                 }               

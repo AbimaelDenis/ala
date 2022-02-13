@@ -21,12 +21,12 @@ import javax.swing.table.AbstractTableModel;
 public class RequestTableModel extends AbstractTableModel implements DataChangeListener {
     
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    private static List<RequestMaterial> requestMaterials = new ArrayList<>();
+    private List<RequestMaterial> requestMaterials = new ArrayList<>();
     
     private String[] columns = {"Código", "Descrição", "Requisitado", "Orçado", "Acréscimo"};
     
     public RequestTableModel(){
-       
+      this.requestMaterials = new ArrayList<>();
     }
     
     @Override

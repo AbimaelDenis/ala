@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -36,14 +35,14 @@ import javax.swing.table.DefaultTableCellRenderer;
  *
  * @author Abimael
  */
-public class MaterialRequestView extends javax.swing.JFrame {
+public class MaterialRequestView extends javax.swing.JFrame implements DataChangeListener {
 
     private Service service;
-    private static RequestMaterialTableModel requestMatModel = new RequestMaterialTableModel();
-    private static StructureSummaryTableModel structureSummaryModel = new StructureSummaryTableModel(requestMatModel);
-    private static BasicMaterialTableModel basicMatModel = new BasicMaterialTableModel();
-    private static StructureTableModel customMatModel = new StructureTableModel();
-    private static MaterialDao materialDao = DaoFactory.createMaterialDao();
+    private RequestMaterialTableModel requestMatModel = new RequestMaterialTableModel();
+    private StructureSummaryTableModel structureSummaryModel = new StructureSummaryTableModel(requestMatModel);
+    private BasicMaterialTableModel basicMatModel = new BasicMaterialTableModel();
+    private StructureTableModel customMatModel = new StructureTableModel();
+    private MaterialDao materialDao = DaoFactory.createMaterialDao();
 
     /**
      * Creates new form TestFrame
@@ -53,9 +52,9 @@ public class MaterialRequestView extends javax.swing.JFrame {
         configFields();
         configTables();
         requestMatModel.subscribeListener(parentView);
-        if (service != null) {           
+        if (service != null) {
             this.service = service;
-            this.requestMatModel.setRequestMaterials(this.service.getRequest());          
+            this.requestMatModel.setRequestMaterials(this.service.getRequest());
             this.structureSummaryModel.setRequestMaterials(this.service.getRequest());
         }
     }
@@ -115,7 +114,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
             }
         });
 
-        btnAddStructure.setText("Inserir");
+        btnAddStructure.setText("Inserir Estrutura");
         btnAddStructure.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddStructureActionPerformed(evt);
@@ -173,12 +172,12 @@ public class MaterialRequestView extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnConsultStructure)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnAddStructure))
+                        .addComponent(btnConsultStructure))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnAddStructure, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAddBasicMaterial)))
                 .addContainerGap())
         );
@@ -196,15 +195,14 @@ public class MaterialRequestView extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddBasicMaterial)
-                    .addComponent(jLabel4))
+                    .addComponent(jLabel4)
+                    .addComponent(btnAddStructure))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 291, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnAddStructure)
-                        .addComponent(btnConsultStructure)))
+                    .addComponent(btnConsultStructure))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -239,8 +237,18 @@ public class MaterialRequestView extends javax.swing.JFrame {
         jScrollPane4.setViewportView(tbStructureSummary);
 
         btnRemoveStructure.setText("Remover");
+        btnRemoveStructure.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveStructureActionPerformed(evt);
+            }
+        });
 
         btnRemoveBasicMaterial.setText("Remover");
+        btnRemoveBasicMaterial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveBasicMaterialActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -291,28 +299,32 @@ public class MaterialRequestView extends javax.swing.JFrame {
 
     private void btnAddBasicMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddBasicMaterialActionPerformed
         if (this.service != null) {
-            Material material = basicMatModel.getMaterial(tbBasicMaterials.getSelectedRow());
-            if (txtQuantMaterial.getText().trim().length() > 0 && Double.parseDouble(txtQuantMaterial.getText().trim()) != 0.0) {
-                RequestMaterial requestMaterial = new RequestMaterial(service.getId(), material.getCode(),
-                        material.getDescription(), material.getUnits(),
-                        Double.parseDouble(txtQuantMaterial.getText()), false);
+            if (tbBasicMaterials.getSelectedRow() != -1) {
+                Material material = basicMatModel.getMaterial(tbBasicMaterials.getSelectedRow());
+                if (txtQuantMaterial.getText().trim().length() > 0 && Double.parseDouble(txtQuantMaterial.getText().trim()) != 0.0) {
+                    RequestMaterial requestMaterial = new RequestMaterial(service.getId(), material.getCode(),
+                            material.getDescription(), material.getUnits(),
+                            Double.parseDouble(txtQuantMaterial.getText()), false);
 
-                try {
-                    if (requestMatModel.getRequestMaterials().contains(requestMaterial)) {
-                        for (RequestMaterial mat : requestMatModel.getRequestMaterials()) {
-                            if (mat.equals(requestMaterial)) {
-                                requestMaterial.setRequestQuantity(mat.getRequestQuantity() + requestMaterial.getRequestQuantity());
+                    try {
+                        if (requestMatModel.getRequestMaterials().contains(requestMaterial)) {
+                            for (RequestMaterial mat : requestMatModel.getRequestMaterials()) {
+                                if (mat.equals(requestMaterial)) {
+                                    requestMaterial.setRequestQuantity(mat.getRequestQuantity() + requestMaterial.getRequestQuantity());
+                                }
                             }
                         }
+                        if (materialDao.insertOrUpdateRequest(requestMaterial) > 0) {
+                            requestMatModel.addMaterial(requestMaterial);
+                        }
+                    } catch (DbException e) {
+                        JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
                     }
-                    if (materialDao.insertRequest(requestMaterial) > 0) {
-                        requestMatModel.addMaterial(requestMaterial);
-                    }
-                } catch (DbException e) {
-                    JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Digite uma quantidade válida.", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Digite uma quantidade válida.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Selecione um item.", "Erro", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Serviço não identificado.", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -321,32 +333,68 @@ public class MaterialRequestView extends javax.swing.JFrame {
 
     private void btnAddStructureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddStructureActionPerformed
         if (this.service != null) {
-            Structure structure = customMatModel.getStructure(tbCustomMaterials.getSelectedRow());
-            if (txtQuantMaterial.getText().trim().length() > 0 && Double.parseDouble(txtQuantMaterial.getText().trim()) != 0.0) {
-                RequestMaterial requestStructure = new RequestMaterial(service.getId(), structure.getCode().toString(),
-                        structure.getDescription(), "CDA",
-                        Double.parseDouble(txtQuantMaterial.getText()), true);
-                try {               
-                    if (structureSummaryModel.getStructuries().contains(requestStructure)) {
-                        for (RequestMaterial mat : structureSummaryModel.getStructuries()) {
-                            if (mat.getCode().equals(requestStructure.getCode())) {                                
-                                requestStructure.setRequestQuantity(mat.getRequestQuantity() + requestStructure.getRequestQuantity());
+            if (tbCustomMaterials.getSelectedRow() != -1) {
+                Structure structure = customMatModel.getStructure(tbCustomMaterials.getSelectedRow());
+                if (txtQuantMaterial.getText().trim().length() > 0 && Double.parseDouble(txtQuantMaterial.getText().trim()) != 0.0) {
+                    RequestMaterial requestStructure = new RequestMaterial(service.getId(), structure.getCode().toString(),
+                            structure.getDescription(), "CDA",
+                            Double.parseDouble(txtQuantMaterial.getText()), true);
+                    try {
+                        if (structureSummaryModel.getStructuries().contains(requestStructure)) {
+                            for (RequestMaterial mat : structureSummaryModel.getStructuries()) {
+                                if (mat.getCode().equals(requestStructure.getCode())) {
+                                    requestStructure.setRequestQuantity(mat.getRequestQuantity() + requestStructure.getRequestQuantity());
+                                }
                             }
                         }
+                        if (materialDao.insertOrUpdateRequest(requestStructure) > 0) {
+                            structureSummaryModel.addStructure(requestStructure);
+                        }
+                    } catch (DbException e) {
+                        JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
                     }
-                    if (materialDao.insertRequest(requestStructure) > 0) {
-                        structureSummaryModel.addStructure(requestStructure);
-                    }
-                } catch (DbException e) {
-                    JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Digite uma quantidade válida.", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Digite uma quantidade válida.", "Erro", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Selecione um item.", "Erro", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Serviço não identificado.", "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnAddStructureActionPerformed
+
+    private void btnRemoveBasicMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveBasicMaterialActionPerformed
+        if (tbRequestMaterials.getSelectedRow() != -1) {
+            RequestMaterial material = requestMatModel.getRequestBasicMaterial((tbRequestMaterials.getSelectedRow()));
+            if (!material.isStructure()) {
+                RemoveMaterialDialog dialogRemove = new RemoveMaterialDialog(this, true, material);
+                dialogRemove.subscribeDataChangeListener(this);
+                dialogRemove.setTitle("Remover material");
+                dialogRemove.setLocationRelativeTo(null);
+                dialogRemove.setResizable(false);
+                dialogRemove.setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(this, "Material de estruturas.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecione um item.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemoveBasicMaterialActionPerformed
+
+    private void btnRemoveStructureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveStructureActionPerformed
+        if (tbStructureSummary.getSelectedRow() != -1) {
+            RequestMaterial material = structureSummaryModel.getRequestStructure((tbStructureSummary.getSelectedRow()));
+            RemoveMaterialDialog dialogRemove = new RemoveMaterialDialog(this, true, material);
+            dialogRemove.subscribeDataChangeListener(this);
+            dialogRemove.setTitle("Remover estrutura");
+            dialogRemove.setLocationRelativeTo(null);
+            dialogRemove.setResizable(false);
+            dialogRemove.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Selecione um item.", "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btnRemoveStructureActionPerformed
 
     /**
      * @param args the command line arguments
@@ -421,7 +469,7 @@ public class MaterialRequestView extends javax.swing.JFrame {
                 boolean structure = ((RequestMaterialTableModel) tbRequestMaterials.getModel()).getBasicRequestMaterials().get(row).isStructure();
                 if (structure) {
                     label.setForeground(Color.red);
-                }else{
+                } else {
                     label.setForeground(Color.black);
                 }
                 //----------------------------------------------------
@@ -458,8 +506,28 @@ public class MaterialRequestView extends javax.swing.JFrame {
         });
     }
 
-    private void fillTables(Service service) {        
+    private void fillTables(Service service) {
         List<RequestMaterial> basicMaterial = service.getRequest().stream().filter(m -> !m.isStructure()).collect(Collectors.toList());
         requestMatModel.setRequestMaterials(basicMaterial);
+    }
+
+    @Override
+    public void onDataChange(Object obj) {
+        try {
+            if (obj != null) {
+                RequestMaterial requestMaterial = (RequestMaterial) obj;
+                if (!requestMaterial.isStructure()) {
+                    if (materialDao.insertOrUpdateRequest(requestMaterial) > 0) {
+                        requestMatModel.addMaterial(requestMaterial);
+                    }
+                } else {
+                    if (materialDao.insertOrUpdateRequest(requestMaterial) > 0) {
+                        structureSummaryModel.addStructure(requestMaterial);
+                    }
+                }
+            }
+        } catch (DbException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

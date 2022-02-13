@@ -1639,13 +1639,13 @@ public class OrderServiceFormView extends javax.swing.JFrame implements DataChan
                 Structure sttr = new Structure(Long.parseLong(material.getCode()), material.getDescription());
                 materialDao.findStructureMaterial(sttr, os.getId());
                 sttr.getMaterials().forEach(m -> m.setRequestQuantity(m.getRequestQuantity() * material.getRequestQuantity()));
-                    for (RequestMaterial mat : sttr.getMaterials()) {
-                        if (reqMaterial.containsKey(mat.getCode())) {
-                            reqMaterial.get(mat.getCode()).setRequestQuantity(reqMaterial.get(mat.getCode()).getRequestQuantity() + mat.getRequestQuantity());
-                        } else {
-                            reqMaterial.put(mat.getCode(), mat);
-                        }
+                for (RequestMaterial mat : sttr.getMaterials()) {
+                    if (reqMaterial.containsKey(mat.getCode())) {
+                        reqMaterial.get(mat.getCode()).setRequestQuantity(reqMaterial.get(mat.getCode()).getRequestQuantity() + mat.getRequestQuantity());
+                    } else {
+                        reqMaterial.put(mat.getCode(), mat);
                     }
+                }
             } else {
                 if (reqMaterial.containsKey(material.getCode())) {
                     reqMaterial.get(material.getCode()).setRequestQuantity(reqMaterial.get(material.getCode()).getRequestQuantity() + material.getRequestQuantity());
@@ -1657,7 +1657,9 @@ public class OrderServiceFormView extends javax.swing.JFrame implements DataChan
         for (String key : reqMaterial.keySet()) {
             requestMaterial.add(reqMaterial.get(key));
         }
+
         requestTableModel.setRequestMaterial(requestMaterial);
+
     }
 
     @Override

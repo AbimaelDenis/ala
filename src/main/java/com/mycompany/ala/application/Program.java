@@ -27,24 +27,15 @@ public class Program {
         oslv.setVisible(true);  
         
 //        MaterialDao dao = DaoFactory.createMaterialDao();
-//        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("F:\\basicMaterial.txt"), "UTF-8"))){
+//        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("F:\\LISTA_DE_MATERIAIS_GERAL.txt"), "UTF-8"))){
 //            String line = br.readLine();
 //            line = br.readLine();
 //            String[] field;
 //            while(line != null){
-//                field = line.split(";");
-//                String code = "";
-//                if(field[1].contains("MUDOU")){
-//                    if(field[2].toUpperCase().contains("FORA")){
-//                        code = field[0];
-//                    }else{
-//                        code = field[2];
-//                    }
-//                }else{
-//                    code = field[0];
-//                }
-//                String descript = field[3];
-//                String unit = field[4];
+//                field = line.split(";");             
+//                String code = field[0];
+//                String descript = field[1];
+//                String unit = field[2];
 //                Material material = new Material(code, descript, unit);
 //                dao.insert(material);
 //                line = br.readLine();

@@ -9,9 +9,11 @@ import com.mycompany.ala.dao.DaoFactory;
 import com.mycompany.ala.dao.MaterialDao;
 import com.mycompany.ala.entities.RequestMaterial;
 import com.mycompany.ala.entities.Structure;
+import com.mycompany.ala.exceptions.DbException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -63,6 +65,10 @@ public class StructureSummaryTableModel extends AbstractTableModel {
         return requestStructuries;
     }
 
+    public RequestMaterial getRequestStructure(int index) {
+        return requestStructuries.get(index);
+    }
+
     public void setRequestMaterials(List<RequestMaterial> materials) {
         this.materials = materials;
         updateStructureTable();
@@ -71,10 +77,15 @@ public class StructureSummaryTableModel extends AbstractTableModel {
 
     public void addStructure(RequestMaterial structure) {
         if (requestStructuries.contains(structure)) {
-            for (RequestMaterial sttr : requestStructuries) {
-                if (sttr.equals(structure)) {
-                    sttr.setRequestQuantity(structure.getRequestQuantity());
+            if (structure.getRequestQuantity() > 0) {
+                for (RequestMaterial sttr : requestStructuries) {
+                    if (sttr.equals(structure)) {
+                        sttr.setRequestQuantity(structure.getRequestQuantity());
+                    }
                 }
+            } else {
+                materials.remove(structure);
+                updateStructureTable();
             }
         } else {
             materials.add(structure);
@@ -89,24 +100,25 @@ public class StructureSummaryTableModel extends AbstractTableModel {
     }
 
     private void loadBasicMaterialList() {
+        
         List<RequestMaterial> structuriesMaterials = new ArrayList<>();
         for (RequestMaterial structure : requestStructuries) {
             Structure sttr = new Structure(Long.parseLong(structure.getCode()), structure.getDescription());
             materialDao.findStructureMaterial(sttr, structure.getServiceId());
-            sttr.getMaterials().forEach(m -> m.setRequestQuantity(m.getRequestQuantity()*structure.getRequestQuantity()));
-            for(RequestMaterial material: sttr.getMaterials()){
-                if(structuriesMaterials.contains(material)){
-                    for(RequestMaterial m : structuriesMaterials){
-                        if(m.equals(material)){
+            sttr.getMaterials().forEach(m -> m.setRequestQuantity(m.getRequestQuantity() * structure.getRequestQuantity()));
+            for (RequestMaterial material : sttr.getMaterials()) {
+                if (structuriesMaterials.contains(material)) {
+                    for (RequestMaterial m : structuriesMaterials) {
+                        if (m.equals(material)) {
                             m.setRequestQuantity(m.getRequestQuantity() + material.getRequestQuantity());
                         }
                     }
-                }else{
+                } else {
                     structuriesMaterials.add(material);
                 }
-            }          
+            }
             structuries.add(sttr);
         }
-        requestMatModel.updateStructureMaterial(structuriesMaterials);
+        requestMatModel.updateStructureMaterial(structuriesMaterials);       
     }
 }
