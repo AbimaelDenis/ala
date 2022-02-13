@@ -6,10 +6,12 @@
 package com.mycompany.ala.dao.impl;
 
 import com.mycompany.ala.dao.DaoFactory;
+import com.mycompany.ala.dao.MaterialDao;
 import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.dao.ReservDao;
 import com.mycompany.ala.db.DB;
 import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.entities.RequestMaterial;
 import com.mycompany.ala.entities.Reserv;
 import com.mycompany.ala.enums.ExpenditureType;
 import com.mycompany.ala.enums.ServiceType;
@@ -25,8 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-
-
 /**
  *
  * @author Abimael
@@ -34,7 +34,8 @@ import java.util.function.Consumer;
 public class OrderServiceDaoJDBC implements OrderServiceDao {
 
     private static Connection conn = null;
-    private ReservDao reservDao = DaoFactory.createReservDao();
+    private static ReservDao reservDao = DaoFactory.createReservDao();
+    private static MaterialDao materialDao = DaoFactory.createMaterialDao();
 
     public OrderServiceDaoJDBC(Connection conn) {
         this.conn = conn;
@@ -129,7 +130,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
 
     @Override
     public List<OrderService> findAllOpenServices() {
-        
+
         List<OrderService> services = new ArrayList<>();
         Statement st = null;
         ResultSet rs = null;
@@ -141,7 +142,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             while (rs.next()) {
                 services.add(instantiateOrderService(rs));
             }
-            
+
             return services;
         } catch (SQLException e) {
             throw new DbException("Error in findAllOpenServices(): " + e.getMessage());
@@ -168,8 +169,6 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
             DB.closeResultSet(rs);
         }
     }
-    
-    
 
     private OrderService instantiateOrderService(ResultSet rs) throws SQLException {
         String id = rs.getString("Id");
@@ -215,9 +214,12 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
         os.setEmbarg(embarg);
 
         reservDao.findReservsById(os);
-        
+        os.setRequest(materialDao.findRequest(os.getId()));
+
         return os;
     }
+
+    
 
     @Override
     public void updateSapCheck(OrderService os) {
@@ -245,7 +247,7 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
                 for (String r : reserv) {
                     reservDao.insertReserv(os.getReservById(r.trim()));
                 }
-            }           
+            }
         } catch (SQLException e) {
             throw new DbException("Transaction rolled back. Error in updateSapCheck(): " + e.getMessage());
         } finally {
@@ -256,20 +258,16 @@ public class OrderServiceDaoJDBC implements OrderServiceDao {
     @Override
     public int updateField(String sql, Consumer con) {
         PreparedStatement st = null;
-        
-        try{
+
+        try {
             st = conn.prepareStatement(sql);
             con.accept(st);
             return st.executeUpdate();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new DbException("Error in updateField(): " + e.getMessage());
-        }finally{
+        } finally {
             DB.closeStatement(st);
         }
     }
 
-    
-    
-
-   
 }

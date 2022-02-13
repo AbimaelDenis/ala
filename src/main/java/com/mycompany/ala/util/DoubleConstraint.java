@@ -25,7 +25,7 @@ public class DoubleConstraint extends PlainDocument{
 
         String oldValue = getText(0, getLength());
         int newLength = oldValue.length() + str.length(); 
-        if(newLength <= maxLength && str.matches("[+-]?\\d*(\\.\\d+)?") || (str.contains(".") && !oldValue.contains("."))){
+        if(newLength <= maxLength && str.matches("\\d*(\\.\\d+)?") || (str.contains(".") && !oldValue.contains("."))){
                 super.insertString(offs, str.toUpperCase(), attr);
             }
         }      

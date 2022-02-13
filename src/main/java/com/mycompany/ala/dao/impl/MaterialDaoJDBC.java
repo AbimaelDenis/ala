@@ -9,6 +9,7 @@ import com.mycompany.ala.dao.MaterialDao;
 import com.mycompany.ala.db.DB;
 import com.mycompany.ala.entities.Material;
 import com.mycompany.ala.entities.RequestMaterial;
+import com.mycompany.ala.entities.Service;
 import com.mycompany.ala.entities.Structure;
 import com.mycompany.ala.exceptions.DbException;
 import java.sql.Connection;
@@ -38,11 +39,12 @@ public class MaterialDaoJDBC implements MaterialDao {
         PreparedStatement st = null;
 
         try {
-            st = conn.prepareStatement("INSERT INTO material (Codigo, Descricao, Unidade) VALUES (?, ?, ?)");
+            st = conn.prepareStatement("INSERT INTO material (Codigo, Descricao, Unidade, Estrutura) VALUES (?, ?, ?, ?)");
 
             st.setString(1, material.getCode().trim());
             st.setString(2, material.getDescription().trim());
             st.setString(3, material.getUnits().trim());
+            st.setBoolean(4, material.isStructure());
 
             st.executeUpdate();
         } catch (SQLException e) {
@@ -63,10 +65,11 @@ public class MaterialDaoJDBC implements MaterialDao {
 
             while (rs.next()) {
                 String code = rs.getString("Codigo");
-                String descript = rs.getString("DEscricao");
+                String descript = rs.getString("Descricao");
                 String unit = rs.getString("Unidade");
+                boolean structure = rs.getBoolean("Estrutura");
 
-                Material material = new Material(code, descript, unit);
+                Material material = new Material(code, descript, unit, structure);
 
                 materials.add(material);
             }
@@ -83,14 +86,15 @@ public class MaterialDaoJDBC implements MaterialDao {
     public int insertRequest(RequestMaterial material) {
         PreparedStatement st = null;
         try {
-            if (!containsMaterial(material.getServiceId(), material.getCode())) {
-                st = conn.prepareStatement("INSERT INTO requestmaterial (Servico, Codigo, Descricao, Unidade, Quantidade) "
-                        + " VALUES (?, ?, ?, ?, ?)");
+            if (!containsMaterial(material.getServiceId(), material)) {
+                st = conn.prepareStatement("INSERT INTO requestmaterial (Servico, Codigo, Descricao, Unidade, Quantidade, Estrutura) "
+                        + " VALUES (?, ?, ?, ?, ?, ?)");
                 st.setString(1, material.getServiceId());
                 st.setString(2, material.getCode());
                 st.setString(3, material.getDescription());
                 st.setString(4, material.getUnits());
                 st.setDouble(5, material.getRequestQuantity());
+                st.setBoolean(6, material.isStructure());
 
                 return st.executeUpdate();
             } else {
@@ -113,7 +117,7 @@ public class MaterialDaoJDBC implements MaterialDao {
         PreparedStatement st = null;
         ResultSet rs = null;
         try {
-            st = conn.prepareStatement("SELECT*FROM requestmaterial WHERE Service = ?");
+            st = conn.prepareStatement("SELECT*FROM requestmaterial WHERE Servico = ?");
             st.setString(1, serviceId);
             rs = st.executeQuery();
 
@@ -123,9 +127,10 @@ public class MaterialDaoJDBC implements MaterialDao {
                 String unit = rs.getString("Unidade");
                 Double quantity = rs.getDouble("Quantidade");
                 String servId = rs.getString("Servico");
+                boolean inStructure = rs.getBoolean("Estrutura");
 
-                RequestMaterial material = new RequestMaterial(serviceId, code, descript, unit, quantity);
-                materials.add(material);
+                RequestMaterial material = new RequestMaterial(serviceId, code, descript, unit, quantity, inStructure);
+                materials.add(material);               
             }
             return materials;
         } catch (SQLException e) {
@@ -149,16 +154,18 @@ public class MaterialDaoJDBC implements MaterialDao {
             rs = st.executeQuery("SELECT*FROM structure ORDER BY id");
 
             while (rs.next()) {
-                Structure sttr = new Structure(rs.getInt("Id"), rs.getString("Nome").trim());
+                Structure sttr = new Structure(rs.getLong("Id"), rs.getString("Nome").trim());
                 structuries.add(sttr);
-                names.add(sttr.getName().trim());
+                names.add(sttr.getDescription().trim());
             }
             
             for (String name : names) {
-                int max = 0;
+                Long max = 0L;
+                Long code;
                 for(Structure sttr : structuries){
-                    if((name.equals(sttr.getName().trim()) && (max < sttr.getId()))){
-                        max = sttr.getId();
+                    code = Long.parseLong(sttr.getCode());
+                    if((name.equals(sttr.getDescription().trim()) && (max < code))){
+                        max = code;
                     }
                 }
                 filterStructuries.add(new Structure(max, name));
@@ -169,7 +176,41 @@ public class MaterialDaoJDBC implements MaterialDao {
         }
     }
 
-    private boolean containsMaterial(String serviceId, String code) {
+    @Override
+    public void findStructureMaterial(Structure structure, String serviceId) {
+        
+        List<RequestMaterial> materials = new ArrayList<>();
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        try{
+            st = conn.prepareStatement("select structurematerial.Id, structure.Nome,structurematerial.Codigo, "
+                    + "material.Descricao, structurematerial.Quantidade, material.unidade from structurematerial "
+                    + "inner join structure on structure.Id = structurematerial.Id join material on "
+                    + "structurematerial.Codigo = material.Codigo WHERE structurematerial.Id = ?");
+            
+            st.setInt(1, Integer.parseInt(structure.getCode()));
+            
+            rs = st.executeQuery();
+            while(rs.next()){               
+                String name = rs.getString("Nome");
+                String code = rs.getString("Codigo");
+                String description = rs.getString("Descricao");
+                Double quantity = rs.getDouble("Quantidade");
+                String unit = rs.getString("Unidade");
+                
+                RequestMaterial material = new RequestMaterial(serviceId, code, description, unit, quantity, true);
+                materials.add(material);
+            }
+            structure.setMaterials(materials);
+            
+        }catch(SQLException e){
+            throw new DbException("Error in findStructureById(): " + e.getMessage());
+        }        
+    }
+    
+    
+
+    private boolean containsMaterial(String serviceId, Material material) {
         PreparedStatement st = null;
         ResultSet rs = null;
 
@@ -177,7 +218,7 @@ public class MaterialDaoJDBC implements MaterialDao {
             st = conn.prepareStatement("SELECT Servico, Codigo FROM requestmaterial WHERE Servico = ? AND Codigo = ?");
 
             st.setString(1, serviceId);
-            st.setString(2, code);
+            st.setString(2, material.getCode());
 
             rs = st.executeQuery();
 

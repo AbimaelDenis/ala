@@ -19,11 +19,11 @@ import javax.swing.table.AbstractTableModel;
  */
 public class BasicMaterialTableModel extends AbstractTableModel {
     private static List<Material> allMaterials = DaoFactory.createMaterialDao().findAll();
-    private List<Material> filterMaterials;
+    private List<Material> filterMaterials = new ArrayList<>();
     private String[] columns = {"Código", "Descrição", "Unidade"};
     
     public BasicMaterialTableModel(){
-        this.filterMaterials = this.allMaterials;
+        this.filterMaterials = this.allMaterials;    
     }
     
     @Override

@@ -12,9 +12,10 @@ package com.mycompany.ala.entities;
 public class RequestMaterial extends Material{
     private String serviceId;
     private Double requestQuantity;
+   
     
-    public RequestMaterial(String serviceId, String code, String description, String units, Double requestQuantity) {
-        super(code, description, units);
+    public RequestMaterial(String serviceId, String code, String description, String units, Double requestQuantity, boolean structure) {
+        super(code, description, units, structure);
         this.serviceId = serviceId;
         this.requestQuantity = requestQuantity; 
     }
@@ -34,7 +35,6 @@ public class RequestMaterial extends Material{
     public void setRequestQuantity(Double requestQuantity) {
         this.requestQuantity = requestQuantity;
     }
-    
     
     
 }

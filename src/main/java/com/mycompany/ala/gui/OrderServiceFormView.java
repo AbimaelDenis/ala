@@ -6,10 +6,13 @@
 package com.mycompany.ala.gui;
 
 import com.mycompany.ala.dao.DaoFactory;
+import com.mycompany.ala.dao.MaterialDao;
 import com.mycompany.ala.dao.OrderServiceDao;
 import com.mycompany.ala.dao.ReservDao;
 import com.mycompany.ala.entities.OrderService;
+import com.mycompany.ala.entities.RequestMaterial;
 import com.mycompany.ala.entities.Reserv;
+import com.mycompany.ala.entities.Structure;
 import com.mycompany.ala.enums.ExpenditureType;
 
 import com.mycompany.ala.enums.OrderServiceFormType;
@@ -41,6 +44,9 @@ import java.util.ArrayList;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,7 +65,7 @@ import javax.swing.event.ChangeListener;
  *
  * @author Abimael
  */
-public class OrderServiceFormView extends javax.swing.JFrame {
+public class OrderServiceFormView extends javax.swing.JFrame implements DataChangeListener<Object> {
 
     private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     private DataChangeListener listener;
@@ -89,6 +95,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             } else {
                 setMode(type);
             }
+            loadRequestMaterialList(os);
         }
         fillFields(os);
     }
@@ -725,7 +732,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         ));
         jScrollPane4.setViewportView(tbProg);
 
-        tbMaterialRequest.setBackground(new java.awt.Color(255, 100, 100));
+        tbMaterialRequest.setBackground(new java.awt.Color(200, 255, 230));
         tbMaterialRequest.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -764,7 +771,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(btnNewProg, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -780,7 +787,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
                                 .addComponent(btnMaterialRequest)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnExportRequest))
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))))
+                            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -852,8 +859,8 @@ public class OrderServiceFormView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
@@ -1514,7 +1521,7 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         tbMaterialRequest.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tbReserv.setModel(reservTableModel);
         tbReserv.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+
         JDialog materialDialog = new JDialog(this, true);
         materialDialog.setTitle("Material");
         tbReserv.addMouseListener(new MouseListener() {
@@ -1616,11 +1623,46 @@ public class OrderServiceFormView extends javax.swing.JFrame {
         JDialog requestView = new JDialog(parentFrame, true);
         requestView.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         requestView.setLocationRelativeTo(null);
-        MaterialRequestView mrv = new MaterialRequestView(this.os);
+        MaterialRequestView mrv = new MaterialRequestView(this.os, this);
         requestView.setContentPane(mrv.getContentPane());
         requestView.setSize(mrv.getSize());
         requestView.setLocationRelativeTo(null);
         requestView.setVisible(true);
+    }
+
+    private void loadRequestMaterialList(OrderService os) {
+        MaterialDao materialDao = DaoFactory.createMaterialDao();
+        Map<String, RequestMaterial> reqMaterial = new HashMap<>();
+        List<RequestMaterial> requestMaterial = new ArrayList<>();
+        for (RequestMaterial material : os.getRequest()) {
+            if (material.isStructure()) {
+                Structure sttr = new Structure(Long.parseLong(material.getCode()), material.getDescription());
+                materialDao.findStructureMaterial(sttr, os.getId());
+                sttr.getMaterials().forEach(m -> m.setRequestQuantity(m.getRequestQuantity() * material.getRequestQuantity()));
+                    for (RequestMaterial mat : sttr.getMaterials()) {
+                        if (reqMaterial.containsKey(mat.getCode())) {
+                            reqMaterial.get(mat.getCode()).setRequestQuantity(reqMaterial.get(mat.getCode()).getRequestQuantity() + mat.getRequestQuantity());
+                        } else {
+                            reqMaterial.put(mat.getCode(), mat);
+                        }
+                    }
+            } else {
+                if (reqMaterial.containsKey(material.getCode())) {
+                    reqMaterial.get(material.getCode()).setRequestQuantity(reqMaterial.get(material.getCode()).getRequestQuantity() + material.getRequestQuantity());
+                } else {
+                    reqMaterial.put(material.getCode(), material);
+                }
+            }
+        }
+        for (String key : reqMaterial.keySet()) {
+            requestMaterial.add(reqMaterial.get(key));
+        }
+        requestTableModel.setRequestMaterial(requestMaterial);
+    }
+
+    @Override
+    public void onDataChange(Object obj) {
+        loadRequestMaterialList(this.os);
     }
 
 }

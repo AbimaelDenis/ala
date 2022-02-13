@@ -16,12 +16,12 @@ import javax.swing.table.AbstractTableModel;
  *
  * @author Abimael
  */
-public class CustomMaterialTableModel extends AbstractTableModel {
-    private static List<Structure> allStructuries = DaoFactory.createMaterialDao().findAllStructure();
-    private static List<Structure> filterStructuries = new ArrayList<>();
+public class StructureTableModel extends AbstractTableModel {
+    private List<Structure> allStructuries = DaoFactory.createMaterialDao().findAllStructure();
+    private List<Structure> filterStructuries = new ArrayList<>();
     private String[] columns = {"id", "Name"};
     
-    public CustomMaterialTableModel(){
+    public StructureTableModel(){
         this.filterStructuries = this.allStructuries;
     }
     
@@ -43,9 +43,13 @@ public class CustomMaterialTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if(columnIndex == 0){
-            return filterStructuries.get(rowIndex).getId();
+            return filterStructuries.get(rowIndex).getCode();
         }
         else
-            return filterStructuries.get(rowIndex).getName();
+            return filterStructuries.get(rowIndex).getDescription();
+    }
+    
+    public Structure getStructure(int index){
+        return filterStructuries.get(index);
     }
 }

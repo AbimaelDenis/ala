@@ -17,7 +17,15 @@ public class Material {
     private String description;  
     private Double dispatchedQuantity;  
     private String units;
+    private boolean structure = false;
 
+    public Material(String code, String description, String units, boolean structure) {
+        this.code = code;
+        this.description = description;
+        this.units = units;
+        this.structure = structure;
+    }
+    
     public Material(String code, String description, String units) {
         this.code = code;
         this.description = description;
@@ -56,10 +64,19 @@ public class Material {
         this.units = units;
     }
 
+    public boolean isStructure() {
+        return structure;
+    }
+
+    public void setStructure(boolean structure) {
+        this.structure = structure;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 67 * hash + Objects.hashCode(this.code);
+        int hash = 3;
+        hash = 97 * hash + Objects.hashCode(this.code);
+        hash = 97 * hash + (this.structure ? 1 : 0);
         return hash;
     }
 
@@ -75,11 +92,18 @@ public class Material {
             return false;
         }
         final Material other = (Material) obj;
+        if (this.structure != other.structure) {
+            return false;
+        }
         if (!Objects.equals(this.code, other.code)) {
             return false;
         }
         return true;
     }
+    
+    
+
+    
     
     
 }

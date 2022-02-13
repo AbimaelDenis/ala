@@ -5,61 +5,29 @@
  */
 package com.mycompany.ala.entities;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  *
  * @author Abimael
  */
-public final class Structure {
-    private Integer id;
-    private String name;
+public class Structure extends Material {  
     
-    public Structure(Integer id, String name){
-        this.id = id;
-        this.name = name;
+    private List<RequestMaterial> materials = new ArrayList<>();
+    
+    public Structure(Long code, String description){
+        super(code.toString(), description, "CDA", true);   
     }
 
-    public Integer getId() {
-        return id;
+    public List<RequestMaterial> getMaterials() {
+        return materials;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setMaterials(List<RequestMaterial> materials) {
+        this.materials = materials;
     }
     
-    
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 89 * hash + Objects.hashCode(this.id);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Structure other = (Structure) obj;
-        if (!Objects.equals(this.id, other.id)) {
-            return false;
-        }
-        return true;
-    }   
+     
 }
