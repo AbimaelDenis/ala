@@ -23,9 +23,9 @@ public class RequestMaterialTableModel extends AbstractTableModel {
 
     private static DataChangeListener listener;
     private static MaterialDao materialDao = DaoFactory.createMaterialDao();
-    private List<RequestMaterial> requestMaterials = new ArrayList<>();
-    private List<RequestMaterial> basicRequestMaterials = new ArrayList<>();
-    private List<RequestMaterial> structuriesRequestMaterials = new ArrayList<>();
+    private List<RequestMaterial> requestMaterials = new ArrayList<>(); // material do serviço
+    private List<RequestMaterial> basicRequestMaterials = new ArrayList<>(); // material exibido
+    private List<RequestMaterial> structuriesRequestMaterials = new ArrayList<>(); // material de estrutura exibido
     private List<Material> budgetMaterials = new ArrayList<>();
     private String[] columns = {"Código", "Descrição", "Unidade", "Requisitado"};
 

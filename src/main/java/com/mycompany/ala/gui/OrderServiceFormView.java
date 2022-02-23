@@ -1631,35 +1631,41 @@ public class OrderServiceFormView extends javax.swing.JFrame implements DataChan
     }
 
     private void loadRequestMaterialList(OrderService os) {
-        MaterialDao materialDao = DaoFactory.createMaterialDao();
-        Map<String, RequestMaterial> reqMaterial = new HashMap<>();
-        List<RequestMaterial> requestMaterial = new ArrayList<>();
-        for (RequestMaterial material : os.getRequest()) {
-            if (material.isStructure()) {
-                Structure sttr = new Structure(Long.parseLong(material.getCode()), material.getDescription());
-                materialDao.findStructureMaterial(sttr, os.getId());
-                sttr.getMaterials().forEach(m -> m.setRequestQuantity(m.getRequestQuantity() * material.getRequestQuantity()));
-                for (RequestMaterial mat : sttr.getMaterials()) {
-                    if (reqMaterial.containsKey(mat.getCode())) {
-                        reqMaterial.get(mat.getCode()).setRequestQuantity(reqMaterial.get(mat.getCode()).getRequestQuantity() + mat.getRequestQuantity());
+        try {
+            MaterialDao materialDao = DaoFactory.createMaterialDao();
+            Map<String, RequestMaterial> reqMaterial = new HashMap<>();
+            List<RequestMaterial> requestMaterial = new ArrayList<>();
+            List<RequestMaterial> osMaterial = materialDao.findRequest(os.getId());
+
+            for (RequestMaterial material : osMaterial) {
+                if (material.isStructure()) {
+                    Structure sttr = new Structure(Long.parseLong(material.getCode()), material.getDescription());
+                    materialDao.findStructureMaterial(sttr, os.getId());
+                    sttr.getMaterials().forEach(m -> m.setRequestQuantity(m.getRequestQuantity() * material.getRequestQuantity()));
+                    for (RequestMaterial mat : sttr.getMaterials()) {
+                        if (reqMaterial.containsKey(mat.getCode())) {
+                            reqMaterial.get(mat.getCode()).setRequestQuantity(reqMaterial.get(mat.getCode()).getRequestQuantity() + mat.getRequestQuantity());
+                        } else {
+                            reqMaterial.put(mat.getCode(), mat);
+                        }
+                    }
+                } else {
+                    if (reqMaterial.containsKey(material.getCode())) {
+                        reqMaterial.get(material.getCode()).setRequestQuantity(reqMaterial.get(material.getCode()).getRequestQuantity() + material.getRequestQuantity());
                     } else {
-                        reqMaterial.put(mat.getCode(), mat);
+                        reqMaterial.put(material.getCode(), material);
                     }
                 }
-            } else {
-                if (reqMaterial.containsKey(material.getCode())) {
-                    reqMaterial.get(material.getCode()).setRequestQuantity(reqMaterial.get(material.getCode()).getRequestQuantity() + material.getRequestQuantity());
-                } else {
-                    reqMaterial.put(material.getCode(), material);
-                }
             }
-        }
-        for (String key : reqMaterial.keySet()) {
-            requestMaterial.add(reqMaterial.get(key));
-        }
+            for (String key : reqMaterial.keySet()) {
+                requestMaterial.add(reqMaterial.get(key));
+            }
 
-        requestTableModel.setRequestMaterial(requestMaterial);
+            requestTableModel.setRequestMaterial(requestMaterial);
 
+        }catch(DbException e){
+            JOptionPane.showMessageDialog(this, "Erro na comunicação com o banco de dados. loadRequestMaterialList(): " + e.getMessage());
+        }
     }
 
     @Override

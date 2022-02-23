@@ -9,7 +9,6 @@ import com.mycompany.ala.dao.MaterialDao;
 import com.mycompany.ala.db.DB;
 import com.mycompany.ala.entities.Material;
 import com.mycompany.ala.entities.RequestMaterial;
-import com.mycompany.ala.entities.Service;
 import com.mycompany.ala.entities.Structure;
 import com.mycompany.ala.exceptions.DbException;
 import java.sql.Connection;
@@ -191,11 +190,24 @@ public class MaterialDaoJDBC implements MaterialDao {
                 }
                 filterStructuries.add(new Structure(max, name));
             }
+            filterStructuries.forEach(str -> findStructureMaterial(str, null));
+              
             return filterStructuries;
         } catch (SQLException e) {
             throw new DbException("Error int findAllStructure(): " + e.getMessage());
         }
     }
+    
+//    private void loadStructureMaterial(Structure structure){
+//        PreparedStatement st = null;
+//        ResultSet rs = null;
+//        
+////        try{
+////            st = conn.prepareStatement("SELECT * FROM")
+////        }catch(SQLException e){
+////            
+////        }
+//    }
 
     @Override
     public void findStructureMaterial(Structure structure, String serviceId) {

@@ -15,6 +15,7 @@ import com.mycompany.ala.exceptions.DbException;
 import com.mycompany.ala.models.BasicMaterialTableModel;
 import com.mycompany.ala.models.StructureTableModel;
 import com.mycompany.ala.models.RequestMaterialTableModel;
+import com.mycompany.ala.models.StructureMaterialTableModel;
 import com.mycompany.ala.models.StructureSummaryTableModel;
 import com.mycompany.ala.services.DataChangeListener;
 import com.mycompany.ala.util.DoubleConstraint;
@@ -25,6 +26,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -149,6 +151,11 @@ public class MaterialRequestView extends javax.swing.JFrame implements DataChang
         jLabel4.setText("Básicos");
 
         btnConsultStructure.setText("Consultar");
+        btnConsultStructure.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultStructureActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -395,6 +402,17 @@ public class MaterialRequestView extends javax.swing.JFrame implements DataChang
             JOptionPane.showMessageDialog(this, "Selecione um item.", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_btnRemoveStructureActionPerformed
+
+    private void btnConsultStructureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultStructureActionPerformed
+       Structure str = customMatModel.getStructure(tbCustomMaterials.getSelectedRow());
+       JDialog structureMaterialDialog = new JDialog(this, true);
+       structureMaterialDialog.setSize(500, 300);
+       structureMaterialDialog.setLocationRelativeTo(null);
+       JTable table = new JTable();
+       table.setModel(new StructureMaterialTableModel(str.getMaterials()));
+       structureMaterialDialog.add(table);
+       structureMaterialDialog.setVisible(true);     
+    }//GEN-LAST:event_btnConsultStructureActionPerformed
 
     /**
      * @param args the command line arguments
